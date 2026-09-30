@@ -1,0 +1,19 @@
+{
+  "name": "Word Arcade 英文單字九宮格",
+  "short_name": "Word Arcade",
+  "description": "適合 iPhone 與 iPad 使用的英文單字練習遊戲。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f1df",
+  "theme_color": "#f6f1df",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

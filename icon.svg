@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="88" fill="#f6f1df"/>
+  <rect x="64" y="64" width="384" height="384" rx="34" fill="#7de0b2" stroke="#18201d" stroke-width="24"/>
+  <path fill="#fff9e8" stroke="#18201d" stroke-width="18" d="M112 112h84v84h-84zM214 112h84v84h-84zM316 112h84v84h-84zM112 214h84v84h-84zM214 214h84v84h-84zM316 214h84v84h-84zM112 316h84v84h-84zM214 316h84v84h-84zM316 316h84v84h-84z"/>
+  <text x="256" y="286" text-anchor="middle" font-family="Georgia, serif" font-size="104" font-weight="900" fill="#18201d">W</text>
+</svg>
