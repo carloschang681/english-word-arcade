@@ -136,7 +136,7 @@
 
       align-items: center;
 
-      gap: 10px;
+      gap: var(--river-gap, 10px);
 
       min-width: 0;
 
@@ -336,7 +336,7 @@
 
       grid-template-columns: repeat(3, minmax(0, 1fr));
 
-      gap: 10px;
+      gap: var(--river-gap, 10px);
 
       margin-top: 14px;
 
@@ -420,7 +420,7 @@
 
       justify-content: space-between;
 
-      gap: 10px;
+      gap: var(--river-gap, 10px);
 
       margin-bottom: 12px;
 
@@ -448,7 +448,7 @@
 
       grid-template-columns: repeat(3, 1fr);
 
-      gap: 10px;
+      gap: var(--river-gap, 10px);
 
     }
 
@@ -576,7 +576,7 @@
 
       display: grid;
 
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
 
       gap: 8px;
 
@@ -668,7 +668,7 @@
 
       grid-template-columns: repeat(3, minmax(0, 1fr));
 
-      gap: 10px;
+      gap: var(--river-gap, 10px);
 
       margin-top: 14px;
 
@@ -762,7 +762,7 @@
 
       grid-template-columns: repeat(4, minmax(0, 1fr));
 
-      gap: 10px;
+      gap: var(--river-gap, 10px);
 
       margin-top: 14px;
 
@@ -1044,13 +1044,13 @@
 
       display: grid;
 
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
 
-      gap: 10px;
+      gap: var(--river-gap, 10px);
 
       width: 100%;
 
-      max-width: 420px;
+      max-width: min(560px, 100%);
 
       margin: auto 0;
 
@@ -1074,7 +1074,7 @@
 
       font-family: Georgia, "Times New Roman", serif;
 
-      font-size: 26px;
+      font-size: var(--stone-font, 26px);
 
       font-weight: 900;
 
@@ -1354,7 +1354,7 @@
 
       grid-template-columns: repeat(3, 1fr);
 
-      gap: 10px;
+      gap: var(--river-gap, 10px);
 
       margin: 14px 0;
 
@@ -1374,7 +1374,7 @@
 
       display: block;
 
-      font-size: 26px;
+      font-size: var(--stone-font, 26px);
 
       line-height: 1;
 
@@ -1774,7 +1774,7 @@
 
       <div class="question">
 
-        <small>目標中文題目（終點）：請依序踩過河中正確字母石頭</small>
+        <small>目標中文題目（終點）：每排 4 選 1，選出能拼成單字的字母</small>
 
         <h3 id="riverQuestionText">準備</h3>
 
@@ -1782,11 +1782,11 @@
 
       <div class="river-arena">
 
-        <div class="river-bank" id="riverGoalBank">🏁 終點：依序拼出單字</div>
+        <div class="river-bank" id="riverGoalBank">🏁 終點提示：部分字母</div>
 
         <div class="river-grid" id="riverGrid"></div>
 
-        <div class="river-bank" id="riverStartBank">🌊 起點：點擊第一個字母出發</div>
+        <div class="river-bank" id="riverStartBank">🌊 起點：每一排只有 1 顆正確石頭</div>
 
       </div>
 
@@ -1874,11 +1874,11 @@
 
     const riverConfig = {
 
-      easy: { total: 15 },
+      easy: { total: 15, min: 3, max: 5 },
 
-      normal: { total: 20 },
+      normal: { total: 20, min: 5, max: 7 },
 
-      hard: { total: 25 }
+      hard: { total: 25, min: 7, max: 12 }
 
     };
 
@@ -3160,9 +3160,19 @@
 
       const config = riverConfig[state.level];
 
-      riverState.deck = shuffle(banks[state.level])
+      const riverCandidates = banks[state.level]
 
-        .filter(([, en]) => /^[a-z]+$/.test(en) && en.length >= 3 && en.length <= 6)
+        .filter(([, en]) => /^[a-z]+$/.test(en));
+
+      const preferredRiverWords = shuffle(riverCandidates)
+
+        .filter(([, en]) => en.length >= config.min && en.length <= config.max);
+
+      const backupRiverWords = shuffle(riverCandidates)
+
+        .filter(([, en]) => en.length < config.min || en.length > config.max);
+
+      riverState.deck = [...preferredRiverWords, ...backupRiverWords]
 
         .slice(0, config.total)
 
@@ -3198,6 +3208,19 @@
 
     }
 
+    function makeRiverHint(word) {
+
+      const letters = word.toUpperCase().split("");
+
+      const revealed = new Set([0, letters.length - 1]);
+
+      if (letters.length >= 6) revealed.add(Math.floor(letters.length / 2));
+
+      if (letters.length >= 8) revealed.add(Math.floor(letters.length / 3));
+
+      return letters.map((letter, index) => revealed.has(index) ? letter : "_").join(" ");
+
+    }
     function loadRiverStage() {
 
       riverState.locked = false;
@@ -3210,31 +3233,39 @@
 
       document.querySelector("#riverQuestionText").textContent = riverState.current.zh;
 
-      document.querySelector("#riverGoalBank").textContent = `🏁 終點目標：${en.toUpperCase()}`;
+      document.querySelector("#riverGoalBank").textContent = `🏁 終點提示：${makeRiverHint(en)}`;
 
-      document.querySelector("#riverStartBank").textContent = `🌊 起點：請點擊第 1 個字母 「${en[0].toUpperCase()}」`;
+      document.querySelector("#riverStartBank").textContent = `🌊 起點：第 1 排開始，每排 4 選 1`;
 
-      riverFeedback.textContent = `請依照單字順序踩正確的石頭過河！目前需要找：${en[0].toUpperCase()}`;
+      riverFeedback.textContent = `每排選 1 顆石頭，走到終點。`;
 
       const letters = en.split("");
 
       const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
 
-      const distractorsNeeded = Math.max(0, 12 - letters.length);
-
       const sourceLetters = banks[state.level].flatMap(([, word]) => word.split("")).filter(l => /^[a-z]$/.test(l));
 
-      const distractors = [];
+      const source = sourceLetters.length ? sourceLetters : alphabet;
 
-      for (let i = 0; i < distractorsNeeded; i++) {
+      riverState.rows = letters.map((char, step) => {
 
-        const src = sourceLetters.length ? sourceLetters : alphabet;
+        const distractors = [];
 
-        distractors.push(src[Math.floor(Math.random() * src.length)]);
+        while (distractors.length < 3) {
 
-      }
+          const letter = source[Math.floor(Math.random() * source.length)];
 
-      riverState.stones = shuffle([...letters.map((char, idx) => ({ char, step: idx, correct: true })), ...distractors.map(char => ({ char, correct: false }))]);
+          if (letter.toLowerCase() !== char.toLowerCase() || !distractors.some((item) => item.toLowerCase() === letter.toLowerCase())) {
+
+            distractors.push(letter);
+
+          }
+
+        }
+
+        return shuffle([{ char, step, correct: true }, ...distractors.map((letter) => ({ char: letter, step, correct: false }))]);
+
+      });
 
       renderRiverStones();
 
@@ -3246,33 +3277,51 @@
 
       riverGrid.innerHTML = "";
 
-      riverState.stones.forEach((stone, index) => {
+      const rowCount = riverState.rows.length;
 
-        const button = document.createElement("button");
+      riverGrid.style.setProperty("--stone-font", `${Math.max(15, Math.min(26, 34 - rowCount * 1.35))}px`);
 
-        button.className = "stone";
+      riverGrid.style.setProperty("--river-gap", `${Math.max(4, Math.min(10, 14 - rowCount))}px`);
 
-        button.type = "button";
+      riverState.rows
 
-        button.textContent = stone.char;
+        .map((row, rowIndex) => ({ row, rowIndex }))
 
-        button.addEventListener("click", () => chooseRiverStone(button, stone, index));
+        .reverse()
 
-        riverGrid.appendChild(button);
+        .forEach(({ row, rowIndex }) => {
+
+        row.forEach((stone) => {
+
+          const button = document.createElement("button");
+
+          button.className = `stone${rowIndex > riverState.currentStep ? " locked" : ""}`;
+
+          button.type = "button";
+
+          button.textContent = stone.char;
+
+          button.disabled = rowIndex !== riverState.currentStep;
+
+          button.addEventListener("click", () => chooseRiverStone(button, stone, rowIndex));
+
+          riverGrid.appendChild(button);
+
+        });
 
       });
 
     }
 
-    function chooseRiverStone(button, stone, index) {
+    function chooseRiverStone(button, stone, rowIndex) {
 
       if (riverState.locked || button.disabled) return;
 
       const targetEn = riverState.current.en;
 
-      const requiredChar = targetEn[riverState.currentStep];
+      const requiredChar = targetEn[rowIndex];
 
-      if (stone.char.toLowerCase() === requiredChar.toLowerCase() && (stone.correct && stone.step === riverState.currentStep)) {
+      if (rowIndex === riverState.currentStep && stone.char.toLowerCase() === requiredChar.toLowerCase() && stone.correct) {
 
         button.classList.add("stepped");
 
@@ -3314,11 +3363,11 @@
 
         } else {
 
-          const nextChar = targetEn[riverState.currentStep];
+          riverFeedback.textContent = `踩對了！請選下一排石頭。`;
 
-          riverFeedback.textContent = `踩對了！下一步請找：${nextChar.toUpperCase()}`;
+          document.querySelector("#riverStartBank").textContent = `🌊 已完成 ${riverState.currentStep} 排，繼續往終點前進。`;
 
-          document.querySelector("#riverStartBank").textContent = `🌊 已走 ${riverState.currentStep} 步，繼續找：${nextChar.toUpperCase()}`;
+          renderRiverStones();
 
         }
 
@@ -3332,7 +3381,7 @@
 
         riverState.locked = true;
 
-        riverFeedback.textContent = `踩錯石頭落水了！正確順序應為 ${targetEn.toUpperCase()}。`;
+        riverFeedback.textContent = `踩錯石頭落水了！看看終點提示，再判斷下一個單字。`;
 
         updateRiverHud();
 
@@ -3871,3 +3920,9 @@
 </body>
 
 </html>
+
+
+
+
+
+
