@@ -1,1869 +1,3377 @@
 <!doctype html>
+
 <html lang="zh-Hant">
+
 <head>
+
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
   <meta name="theme-color" content="#f6f1df">
+
   <meta name="apple-mobile-web-app-capable" content="yes">
+
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <meta name="apple-mobile-web-app-title" content="Word Arcade">
+
   <meta name="mobile-web-app-capable" content="yes">
+
   <link rel="manifest" href="./manifest.webmanifest">
+
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
+
   <link rel="apple-touch-icon" href="./icon.svg">
+
   <title>Word Arcade | 英文單字九宮格</title>
+
   <style>
+
     :root {
+
       --ink: #18201d;
+
       --muted: #647067;
+
       --paper: #f6f1df;
+
       --panel: #fff9e8;
+
       --line: #1f2b24;
+
       --mint: #7de0b2;
+
       --yellow: #f7d45c;
+
       --coral: #f1745f;
+
       --blue: #4d8eca;
-      --shadow: 0 18px 0 #18201d;
+
+      --shadow: 0 14px 0 #18201d;
+
       --radius: 8px;
+
     }
 
     * {
+
       box-sizing: border-box;
+
+      -webkit-tap-highlight-color: transparent;
+
+    }
+
+    html {
+
+      -webkit-text-size-adjust: 100%;
+
     }
 
     body {
+
       min-height: 100vh;
+
       margin: 0;
+
       color: var(--ink);
+
       font-family: "Microsoft JhengHei", "Noto Sans TC", "Segoe UI", sans-serif;
+
       background:
+
         linear-gradient(90deg, rgba(24, 32, 29, .055) 1px, transparent 1px),
+
         linear-gradient(0deg, rgba(24, 32, 29, .055) 1px, transparent 1px),
+
         radial-gradient(circle at 20% 15%, rgba(125, 224, 178, .55), transparent 24rem),
+
         radial-gradient(circle at 82% 8%, rgba(247, 212, 92, .48), transparent 22rem),
+
         radial-gradient(circle at 72% 90%, rgba(241, 116, 95, .33), transparent 24rem),
+
         var(--paper);
+
       background-size: 28px 28px, 28px 28px, auto, auto, auto, auto;
+
+      overflow-x: hidden;
+
     }
 
     button {
+
       font: inherit;
+
     }
 
     .shell {
-      width: min(1180px, calc(100% - 32px));
+
+      width: min(1180px, calc(100% - 24px));
+
       min-height: 100vh;
+
       margin: 0 auto;
-      padding: 30px 0 36px;
+
+      padding: env(safe-area-inset-top, 20px) 0 calc(env(safe-area-inset-bottom, 20px) + 24px);
+
     }
 
     .topbar {
+
       display: flex;
+
       align-items: center;
+
       justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 22px;
+
+      gap: 12px;
+
+      margin-bottom: 18px;
+
     }
 
     .brand {
+
       display: flex;
+
       align-items: center;
-      gap: 12px;
+
+      gap: 10px;
+
       min-width: 0;
+
     }
 
     .mark {
+
       display: grid;
-      width: 54px;
-      height: 54px;
+
+      width: 46px;
+
+      height: 46px;
+
       border: 3px solid var(--line);
+
       background: var(--mint);
-      box-shadow: 6px 6px 0 var(--line);
+
+      box-shadow: 4px 4px 0 var(--line);
+
       grid-template-columns: repeat(3, 1fr);
-      gap: 3px;
-      padding: 6px;
+
+      gap: 2px;
+
+      padding: 5px;
+
       transform: rotate(-3deg);
+
+      flex-shrink: 0;
+
     }
 
     .mark span {
+
       border: 2px solid var(--line);
+
       background: var(--panel);
+
     }
 
     h1 {
+
       margin: 0;
+
       font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(30px, 5vw, 68px);
-      line-height: .88;
+
+      font-size: clamp(26px, 6vw, 56px);
+
+      line-height: .9;
+
       letter-spacing: 0;
+
     }
 
     .tag {
+
       display: inline-flex;
+
       align-items: center;
-      min-height: 38px;
-      padding: 8px 12px;
+
+      min-height: 34px;
+
+      padding: 6px 10px;
+
       border: 3px solid var(--line);
+
       background: var(--yellow);
-      box-shadow: 5px 5px 0 var(--line);
+
+      box-shadow: 4px 4px 0 var(--line);
+
       font-weight: 800;
+
       white-space: nowrap;
+
+      font-size: 14px;
+
     }
 
     .stage {
+
       display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
-      gap: 24px;
+
+      grid-template-columns: minmax(0, 1.08fr) minmax(280px, .92fr);
+
+      gap: 20px;
+
       align-items: start;
+
     }
 
     .hero,
+
     .game-card,
+
     .match-card,
+
     .result-card {
+
       border: 4px solid var(--line);
+
       background: var(--panel);
+
       box-shadow: var(--shadow);
+
     }
 
     .hero {
-      padding: clamp(20px, 3vw, 34px);
+
+      padding: clamp(16px, 3vw, 30px);
+
       position: relative;
+
       overflow: hidden;
+
     }
 
     .hero::after {
+
       content: "ABC";
+
       position: absolute;
+
       right: -12px;
+
       bottom: -34px;
+
       color: rgba(24, 32, 29, .06);
+
       font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(110px, 18vw, 230px);
+
+      font-size: clamp(100px, 18vw, 200px);
+
       font-weight: 900;
+
       pointer-events: none;
+
     }
 
     .eyebrow {
+
       width: fit-content;
-      margin: 0 0 18px;
-      padding: 7px 11px;
+
+      margin: 0 0 14px;
+
+      padding: 6px 10px;
+
       border: 3px solid var(--line);
+
       background: var(--coral);
+
       color: #fff8df;
+
       font-weight: 900;
-      box-shadow: 4px 4px 0 var(--line);
+
+      box-shadow: 3px 3px 0 var(--line);
+
       transform: rotate(-1deg);
+
+      font-size: 13px;
+
     }
 
     .headline {
+
       max-width: 760px;
-      margin: 0 0 18px;
+
+      margin: 0 0 14px;
+
       font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(42px, 8vw, 104px);
-      line-height: .9;
+
+      font-size: clamp(32px, 7vw, 84px);
+
+      line-height: .95;
+
       letter-spacing: 0;
+
     }
 
     .subcopy {
+
       max-width: 610px;
-      margin: 0 0 28px;
+
+      margin: 0 0 22px;
+
       color: var(--muted);
-      font-size: 18px;
-      line-height: 1.65;
+
+      font-size: 16px;
+
+      line-height: 1.6;
+
       font-weight: 700;
+
     }
 
     .difficulty-grid {
+
       display: grid;
+
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 18px;
+
+      gap: 10px;
+
+      margin-top: 14px;
+
       position: relative;
+
       z-index: 1;
+
     }
 
     .difficulty {
-      min-height: 118px;
+
+      min-height: 104px;
+
       border: 3px solid var(--line);
+
       background: #fffdf4;
-      box-shadow: 7px 7px 0 var(--line);
+
+      box-shadow: 5px 5px 0 var(--line);
+
       cursor: pointer;
+
       text-align: left;
-      padding: 15px;
+
+      padding: 12px;
+
       transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+
     }
 
     .difficulty:hover,
+
     .difficulty.active {
+
       transform: translate(-2px, -2px);
-      box-shadow: 10px 10px 0 var(--line);
+
+      box-shadow: 8px 8px 0 var(--line);
+
       background: var(--mint);
+
     }
 
     .difficulty strong {
+
       display: block;
-      margin-bottom: 8px;
-      font-size: 24px;
+
+      margin-bottom: 6px;
+
+      font-size: 20px;
+
       font-weight: 1000;
+
     }
 
     .difficulty span {
+
       display: block;
+
       color: var(--muted);
-      font-size: 14px;
+
+      font-size: 12px;
+
       font-weight: 800;
-      line-height: 1.45;
+
+      line-height: 1.4;
+
     }
 
     .arcade {
+
       display: grid;
-      gap: 18px;
+
+      gap: 14px;
+
     }
 
     .panel-title {
+
       display: flex;
+
       align-items: end;
+
       justify-content: space-between;
-      gap: 12px;
+
+      gap: 10px;
+
       margin-bottom: 12px;
+
     }
 
     .panel-title h2,
+
     .game-card h2,
+
     .result-card h2 {
+
       margin: 0;
+
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 34px;
+
+      font-size: 28px;
+
       letter-spacing: 0;
+
     }
 
     .board {
+
       display: grid;
+
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+
+      gap: 10px;
+
     }
 
     .tile {
+
       aspect-ratio: 1;
-      border: 4px solid var(--line);
+
+      border: 3px solid var(--line);
+
       background: #fffdf4;
-      box-shadow: 7px 7px 0 var(--line);
-      padding: 12px;
+
+      box-shadow: 5px 5px 0 var(--line);
+
+      padding: 10px;
+
       display: flex;
+
       flex-direction: column;
+
       justify-content: space-between;
+
       cursor: not-allowed;
+
       color: rgba(24, 32, 29, .38);
+
       position: relative;
+
       overflow: hidden;
+
     }
 
     .tile.active {
+
       cursor: pointer;
+
       color: var(--ink);
+
       background:
+
         linear-gradient(135deg, rgba(125, 224, 178, .86), rgba(255, 249, 232, .85) 58%),
+
         #fffdf4;
+
     }
 
     .tile.active:hover {
+
       transform: translate(-2px, -2px);
-      box-shadow: 10px 10px 0 var(--line);
+
+      box-shadow: 8px 8px 0 var(--line);
+
     }
 
     .tile-number {
+
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 38px;
+
+      font-size: 30px;
+
       font-weight: 900;
+
       line-height: 1;
+
     }
 
     .tile-label {
+
       font-weight: 1000;
+
       line-height: 1.2;
+
+      font-size: 13px;
+
     }
 
     .lock {
+
       align-self: flex-end;
-      width: 25px;
-      height: 25px;
-      border: 3px solid currentColor;
-      border-radius: 5px;
+
+      width: 20px;
+
+      height: 20px;
+
+      border: 2px solid currentColor;
+
+      border-radius: 4px;
+
       position: relative;
+
       opacity: .72;
+
     }
 
     .lock::before {
+
       content: "";
+
       position: absolute;
-      width: 15px;
-      height: 13px;
+
+      width: 12px;
+
+      height: 10px;
+
       left: 2px;
-      top: -14px;
-      border: 3px solid currentColor;
+
+      top: -11px;
+
+      border: 2px solid currentColor;
+
       border-bottom: 0;
-      border-radius: 12px 12px 0 0;
+
+      border-radius: 10px 10px 0 0;
+
     }
 
     .game-card,
+
     .result-card {
-      padding: 20px;
+
+      padding: 16px;
+
     }
 
     .hud {
+
       display: grid;
+
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin: 16px 0;
+
+      gap: 8px;
+
+      margin: 14px 0;
+
     }
 
     .meter {
-      min-height: 72px;
+
+      min-height: 60px;
+
       border: 3px solid var(--line);
+
       background: #fffdf4;
-      padding: 10px;
+
+      padding: 8px;
+
     }
 
     .meter b {
+
       display: block;
-      font-size: 24px;
+
+      font-size: 20px;
+
       line-height: 1;
+
     }
 
     .meter span {
+
       display: block;
-      margin-top: 8px;
+
+      margin-top: 6px;
+
       color: var(--muted);
-      font-size: 12px;
+
+      font-size: 11px;
+
       font-weight: 900;
+
     }
 
     .question {
+
       border: 4px solid var(--line);
+
       background: var(--yellow);
-      padding: 18px;
-      margin: 14px 0;
-      box-shadow: 6px 6px 0 var(--line);
+
+      padding: 16px;
+
+      margin: 12px 0;
+
+      box-shadow: 5px 5px 0 var(--line);
+
     }
 
     .question small {
+
       display: block;
-      margin-bottom: 10px;
+
+      margin-bottom: 8px;
+
       font-weight: 1000;
+
       color: rgba(24, 32, 29, .72);
+
+      font-size: 12px;
+
     }
 
     .question h3 {
+
       margin: 0;
-      font-size: clamp(32px, 6vw, 60px);
-      line-height: 1.05;
+
+      font-size: clamp(28px, 5.5vw, 48px);
+
+      line-height: 1.1;
+
       letter-spacing: 0;
+
+      overflow-wrap: anywhere;
+
     }
 
     .choices {
+
       display: grid;
+
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 18px;
+
+      gap: 10px;
+
+      margin-top: 14px;
+
     }
 
     .choice {
-      min-height: 142px;
-      border: 4px solid var(--line);
+
+      min-height: 110px;
+
+      border: 3px solid var(--line);
+
       background: #fffdf4;
-      box-shadow: 7px 7px 0 var(--line);
-      padding: 14px;
+
+      box-shadow: 5px 5px 0 var(--line);
+
+      padding: 10px;
+
       cursor: pointer;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       text-align: center;
-      font-size: clamp(22px, 3.2vw, 34px);
+
+      font-size: clamp(18px, 3vw, 28px);
+
       font-family: Georgia, "Times New Roman", serif;
+
       font-weight: 900;
+
       letter-spacing: 0;
+
       overflow-wrap: anywhere;
+
+      word-break: break-word;
+
       transition: transform .14s ease, background .14s ease, box-shadow .14s ease;
+
     }
 
     .choice:hover:not(:disabled) {
+
       transform: translate(-2px, -2px) rotate(-1deg);
-      box-shadow: 10px 10px 0 var(--line);
+
+      box-shadow: 8px 8px 0 var(--line);
+
       background: var(--mint);
+
     }
 
     .choice:disabled {
+
       cursor: default;
+
     }
 
     .choice.correct {
+
       background: var(--mint);
+
     }
 
     .choice.wrong {
+
       background: var(--coral);
+
       color: #fff8df;
+
     }
 
     .feedback {
-      min-height: 30px;
-      margin: 16px 0 0;
+
+      min-height: 26px;
+
+      margin: 14px 0 0;
+
       font-weight: 1000;
+
       color: var(--ink);
+
+      font-size: 14px;
+
     }
 
     .match-board {
+
       display: grid;
+
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 18px;
+
+      gap: 10px;
+
+      margin-top: 14px;
+
     }
 
     .match-card {
-      min-height: 112px;
-      box-shadow: 6px 6px 0 var(--line);
-      padding: 12px;
+
+      min-height: 96px;
+
+      box-shadow: 5px 5px 0 var(--line);
+
+      padding: 10px;
+
       cursor: pointer;
+
       display: flex;
+
       flex-direction: column;
+
       align-items: flex-start;
+
       justify-content: space-between;
+
       text-align: left;
+
+      border: 3px solid var(--line);
+
+      background: #fffdf4;
+
       transition: transform .14s ease, background .14s ease, opacity .14s ease;
+
     }
 
     .match-card:hover:not(:disabled) {
+
       transform: translate(-2px, -2px);
+
       background: var(--yellow);
+
     }
 
     .match-card.selected {
+
       background: var(--blue);
+
       color: #fffdf4;
+
       transform: translate(-2px, -2px) rotate(-1deg);
+
     }
 
     .match-card.matched {
+
       pointer-events: none;
+
       opacity: 0;
+
       transform: scale(.86) rotate(2deg);
+
     }
 
     .match-card.wrong {
+
       background: var(--coral);
+
       color: #fff8df;
+
     }
 
     .gate-arena {
+
       position: relative;
-      min-height: min(62vh, 560px);
-      margin-top: 18px;
+
+      min-height: 440px;
+
+      margin-top: 14px;
+
       border: 4px solid var(--line);
+
       background:
+
         linear-gradient(90deg, rgba(24, 32, 29, .08) 1px, transparent 1px),
+
         linear-gradient(0deg, rgba(24, 32, 29, .08) 1px, transparent 1px),
+
         #fffdf4;
-      background-size: 42px 42px;
+
+      background-size: 36px 36px;
+
       overflow: hidden;
-      box-shadow: inset 0 -76px 0 rgba(241, 116, 95, .16);
+
+      box-shadow: inset 0 -64px 0 rgba(241, 116, 95, .16);
+
     }
 
     .kill-line {
+
       position: absolute;
+
       left: 0;
+
       right: 0;
-      bottom: 76px;
-      height: 6px;
+
+      bottom: 64px;
+
+      height: 5px;
+
       background: var(--coral);
-      box-shadow: 0 0 0 3px var(--line), 0 10px 0 rgba(24, 32, 29, .18);
+
+      box-shadow: 0 0 0 3px var(--line), 0 8px 0 rgba(24, 32, 29, .18);
+
       z-index: 3;
+
     }
 
     .kill-line::before {
+
       content: "斬殺線";
+
       position: absolute;
-      right: 12px;
-      bottom: 12px;
-      border: 3px solid var(--line);
+
+      right: 10px;
+
+      bottom: 10px;
+
+      border: 2px solid var(--line);
+
       background: var(--coral);
+
       color: #fff8df;
-      padding: 5px 9px;
+
+      padding: 3px 7px;
+
       font-weight: 1000;
+
+      font-size: 11px;
+
     }
 
     .fall-card {
+
       position: absolute;
-      top: -120px;
+
+      top: -100px;
+
       left: var(--x);
-      width: min(16vw, 142px);
-      min-width: 92px;
-      min-height: 78px;
-      border: 4px solid var(--line);
+
+      width: min(22vw, 120px);
+
+      min-width: 78px;
+
+      min-height: 68px;
+
+      border: 3px solid var(--line);
+
       background: var(--panel);
-      box-shadow: 6px 6px 0 var(--line);
-      padding: 10px;
+
+      box-shadow: 4px 4px 0 var(--line);
+
+      padding: 8px;
+
       cursor: pointer;
+
       animation: cardFall var(--dur) linear forwards;
+
       animation-delay: var(--delay);
+
       z-index: 2;
+
     }
 
     .fall-card:hover {
+
       background: var(--yellow);
+
       transform: rotate(-2deg);
+
     }
 
     .fall-card.selected {
+
       background: var(--blue);
+
       color: #fffdf4;
+
     }
 
     .fall-card.wrong {
+
       background: var(--coral);
+
       color: #fff8df;
+
     }
 
     .fall-card.cleared {
+
       animation-play-state: paused;
+
       opacity: 0;
+
       pointer-events: none;
+
       transform: scale(.82) rotate(4deg);
+
       transition: opacity .18s ease, transform .18s ease;
+
     }
 
     @keyframes cardFall {
+
       from {
-        top: -120px;
+
+        top: -100px;
+
       }
+
       to {
-        top: calc(100% - 76px);
+
+        top: calc(100% - 64px);
+
       }
+
     }
 
     .gate-kind {
+
       display: inline-flex;
-      min-height: 22px;
+
+      min-height: 20px;
+
       align-items: center;
+
       border: 2px solid currentColor;
-      padding: 1px 6px;
-      font-size: 11px;
+
+      padding: 1px 5px;
+
+      font-size: 10px;
+
       font-weight: 1000;
+
     }
 
     .gate-word {
+
       display: block;
-      margin-top: 4px;
+
+      margin-top: 2px;
+
       font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(22px, 2.6vw, 34px);
+
+      font-size: clamp(18px, 3.2vw, 26px);
+
       font-weight: 900;
-      line-height: 1.02;
+
+      line-height: 1.1;
+
       overflow-wrap: anywhere;
+
       letter-spacing: 0;
+
     }
 
     .spell-answer {
+
       display: flex;
+
       flex-wrap: wrap;
-      gap: 8px;
-      min-height: 70px;
+
+      gap: 6px;
+
+      min-height: 62px;
+
       align-items: center;
-      border: 4px solid var(--line);
+
+      border: 3px solid var(--line);
+
       background: #fffdf4;
-      box-shadow: 6px 6px 0 var(--line);
-      padding: 12px;
-      margin: 18px 0;
+
+      box-shadow: 5px 5px 0 var(--line);
+
+      padding: 10px;
+
+      margin: 14px 0;
+
     }
 
     .spell-slot {
+
       display: grid;
+
       place-items: center;
-      width: 46px;
-      height: 46px;
-      border: 3px solid var(--line);
+
+      width: 40px;
+
+      height: 40px;
+
+      border: 2px solid var(--line);
+
       background: var(--yellow);
+
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 28px;
+
+      font-size: 24px;
+
       font-weight: 900;
+
       text-transform: uppercase;
+
     }
 
     .letter-bank {
+
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(54px, 1fr));
-      gap: 10px;
-      margin-top: 14px;
+
+      grid-template-columns: repeat(auto-fit, minmax(46px, 1fr));
+
+      gap: 8px;
+
+      margin-top: 12px;
+
     }
 
     .letter-tile {
-      min-height: 58px;
-      border: 4px solid var(--line);
+
+      min-height: 50px;
+
+      border: 3px solid var(--line);
+
       background: var(--panel);
-      box-shadow: 5px 5px 0 var(--line);
+
+      box-shadow: 4px 4px 0 var(--line);
+
       cursor: pointer;
+
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 28px;
+
+      font-size: 24px;
+
       font-weight: 900;
+
       text-transform: uppercase;
+
       transition: transform .14s ease, background .14s ease, opacity .14s ease;
+
     }
 
     .letter-tile:hover:not(:disabled) {
+
       transform: translate(-2px, -2px) rotate(-1deg);
+
       background: var(--mint);
+
     }
 
     .letter-tile:disabled {
+
       opacity: .28;
+
       cursor: default;
+
       transform: none;
+
     }
 
     .match-kind {
+
       display: inline-flex;
-      min-height: 24px;
+
+      min-height: 20px;
+
       align-items: center;
+
       border: 2px solid currentColor;
-      padding: 2px 7px;
-      font-size: 12px;
+
+      padding: 1px 5px;
+
+      font-size: 11px;
+
       font-weight: 1000;
+
     }
 
     .match-word {
+
       width: 100%;
+
       font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(20px, 2.6vw, 31px);
+
+      font-size: clamp(16px, 2.8vw, 24px);
+
       font-weight: 900;
-      line-height: 1.05;
+
+      line-height: 1.1;
+
       overflow-wrap: anywhere;
+
       letter-spacing: 0;
+
     }
 
     .actions {
+
       display: flex;
+
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 16px;
+
+      gap: 8px;
+
+      margin-top: 14px;
+
     }
 
     .action {
-      min-height: 44px;
+
+      min-height: 42px;
+
       border: 3px solid var(--line);
+
       background: var(--blue);
+
       color: #fffdf4;
-      box-shadow: 5px 5px 0 var(--line);
-      padding: 8px 14px;
+
+      box-shadow: 4px 4px 0 var(--line);
+
+      padding: 8px 12px;
+
       font-weight: 1000;
+
       cursor: pointer;
+
     }
 
     .action.secondary {
+
       background: #fffdf4;
+
       color: var(--ink);
+
     }
 
     .action:hover {
+
       transform: translate(-1px, -1px);
-      box-shadow: 7px 7px 0 var(--line);
+
+      box-shadow: 6px 6px 0 var(--line);
+
     }
 
     .hidden {
+
       display: none !important;
+
     }
 
     .result-stats {
+
       display: grid;
+
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin: 18px 0;
+
+      gap: 10px;
+
+      margin: 14px 0;
+
     }
 
     .result-stats div {
+
       border: 3px solid var(--line);
+
       background: #fffdf4;
-      padding: 14px;
+
+      padding: 10px;
+
     }
 
     .result-stats b {
+
       display: block;
-      font-size: 32px;
+
+      font-size: 26px;
+
       line-height: 1;
+
     }
 
     .result-stats span {
+
       color: var(--muted);
+
       font-weight: 900;
-      font-size: 13px;
+
+      font-size: 12px;
+
     }
 
     @media (max-width: 900px) {
+
       .stage,
+
       .difficulty-grid,
+
       .choices,
+
       .match-board {
+
         grid-template-columns: 1fr;
+
       }
 
       .topbar {
+
         align-items: flex-start;
+
         flex-direction: column;
+
       }
 
       .hud,
+
       .result-stats {
+
         grid-template-columns: repeat(2, 1fr);
+
       }
+
     }
 
     @media (max-width: 560px) {
+
       .shell {
-        width: min(100% - 20px, 1180px);
-        padding-top: 16px;
+
+        width: min(100% - 16px, 1180px);
+
       }
 
       .board {
+
         gap: 8px;
+
       }
 
       .tile {
-        padding: 9px;
+
+        padding: 8px;
+
       }
 
       .tile-number {
-        font-size: 27px;
+
+        font-size: 24px;
+
       }
 
       .tile-label {
-        font-size: 13px;
+
+        font-size: 12px;
+
       }
 
       .hud,
+
       .result-stats {
-        grid-template-columns: 1fr;
+
+        grid-template-columns: repeat(2, 1fr);
+
+      }
+
+      .match-board {
+
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
       }
 
       .match-card {
-        min-height: 94px;
+
+        min-height: 84px;
+
       }
 
       .gate-arena {
-        min-height: 560px;
+
+        min-height: 380px;
+
       }
 
       .fall-card {
-        width: 108px;
-        min-width: 108px;
+
+        width: 92px;
+
+        min-width: 82px;
+
       }
+
     }
+
   </style>
+
 </head>
+
 <body>
+
   <main class="shell">
+
     <header class="topbar">
+
       <div class="brand">
+
         <div class="mark" aria-hidden="true">
+
           <span></span><span></span><span></span>
+
           <span></span><span></span><span></span>
+
           <span></span><span></span><span></span>
+
         </div>
+
         <h1>Word Arcade</h1>
+
       </div>
+
       <div class="tag">九宮格單字挑戰</div>
+
     </header>
 
     <section class="stage" id="home">
+
       <div class="hero">
+
         <p class="eyebrow">選難度，再闖九宮格</p>
+
         <p class="headline">看中文，拍下正確英文卡。</p>
+
         <p class="subcopy">第一宮格是 3 選 1 單字快打，第二宮格是中英配對消消樂，第三宮格是英文同類卡牌斬殺線。先選難度，再進入關卡。</p>
 
         <div class="difficulty-grid" aria-label="難度選擇">
+
           <button class="difficulty active" data-level="easy">
+
             <strong>簡單</strong>
+
             <span>國中程度，生活與校園常用單字。</span>
+
           </button>
+
           <button class="difficulty" data-level="normal">
+
             <strong>普通</strong>
+
             <span>高中階段，抽象概念與閱讀常見字。</span>
+
           </button>
+
           <button class="difficulty" data-level="hard">
+
             <strong>困難</strong>
+
             <span>TOEIC 商務、職場與正式情境字彙。</span>
+
           </button>
+
         </div>
+
       </div>
 
       <aside class="arcade">
+
         <div class="panel-title">
+
           <h2>九宮格</h2>
+
           <span class="tag" id="selectedLabel">簡單</span>
+
         </div>
+
         <div class="board" id="board" aria-label="關卡九宮格"></div>
+
       </aside>
+
     </section>
 
     <section class="game-card hidden" id="game" aria-live="polite">
+
       <div class="panel-title">
+
         <h2 id="gameTitle">第一宮格</h2>
+
         <span class="tag" id="levelBadge">簡單</span>
+
       </div>
 
       <div class="hud">
+
         <div class="meter"><b id="lifeText">3</b><span>生命</span></div>
+
         <div class="meter"><b id="scoreText">0</b><span>分數</span></div>
+
         <div class="meter"><b id="countText">1 / 50</b><span>題數</span></div>
+
         <div class="meter"><b id="bonusText">0 / 5</b><span>加命進度</span></div>
+
       </div>
 
       <div class="question">
+
         <small>題目：中文意思</small>
+
         <h3 id="questionText">準備</h3>
+
       </div>
 
       <div class="choices" id="choices"></div>
+
       <div class="feedback" id="feedback"></div>
 
       <div class="actions">
+
         <button class="action secondary" id="backBtn">回九宮格</button>
+
         <button class="action" id="nextBtn" disabled>下一題</button>
+
       </div>
+
     </section>
 
     <section class="game-card hidden" id="matchGame" aria-live="polite">
+
       <div class="panel-title">
+
         <h2>第二宮格：配對消消樂</h2>
+
         <span class="tag" id="matchLevelBadge">簡單</span>
+
       </div>
 
       <div class="hud">
+
         <div class="meter"><b id="matchRoundText">1 / 10</b><span>輪數</span></div>
+
         <div class="meter"><b id="matchTimeText">120</b><span>剩餘秒數</span></div>
+
         <div class="meter"><b id="matchPairText">0 / 6</b><span>本輪配對</span></div>
+
         <div class="meter"><b id="matchScoreText">0</b><span>分數</span></div>
+
       </div>
 
       <div class="question">
+
         <small>玩法：點一張中文卡，再點一張對應英文卡</small>
+
         <h3 id="matchPrompt">配對成功就消除</h3>
+
       </div>
 
       <div class="match-board" id="matchBoard"></div>
+
       <div class="feedback" id="matchFeedback"></div>
 
       <div class="actions">
+
         <button class="action secondary" id="matchBackBtn">回九宮格</button>
+
         <button class="action" id="matchNextBtn" disabled>下一輪</button>
+
       </div>
+
     </section>
 
     <section class="game-card hidden" id="gateGame" aria-live="polite">
+
       <div class="panel-title">
+
         <h2>第三宮格：斬殺線</h2>
+
         <span class="tag" id="gateLevelBadge">簡單</span>
+
       </div>
 
       <div class="hud">
+
         <div class="meter"><b id="gateStageText">1 / 20</b><span>關卡</span></div>
+
         <div class="meter"><b id="gateTimeText">10</b><span>剩餘秒數</span></div>
+
         <div class="meter"><b id="gateScoreText">0</b><span>分數</span></div>
+
         <div class="meter"><b id="gateNeedText">2</b><span>選牌數</span></div>
+
       </div>
 
       <div class="question">
+
         <small>玩法：從 8 張英文下落卡牌中，點選 2 張同類型單字</small>
+
         <h3 id="gatePrompt">別讓任何牌越過斬殺線</h3>
+
       </div>
 
       <div class="gate-arena" id="gateArena">
+
         <div class="kill-line" aria-hidden="true"></div>
+
       </div>
+
       <div class="feedback" id="gateFeedback"></div>
 
       <div class="actions">
+
         <button class="action secondary" id="gateBackBtn">回九宮格</button>
+
       </div>
+
     </section>
 
     <section class="game-card hidden" id="spellGame" aria-live="polite">
+
       <div class="panel-title">
+
         <h2>第四宮格：單字拼圖</h2>
+
         <span class="tag" id="spellLevelBadge">簡單</span>
+
       </div>
 
       <div class="hud">
+
         <div class="meter"><b id="spellLifeText">3</b><span>生命</span></div>
+
         <div class="meter"><b id="spellScoreText">0</b><span>分數</span></div>
+
         <div class="meter"><b id="spellCountText">1 / 20</b><span>題數</span></div>
+
         <div class="meter"><b id="spellLengthText">0</b><span>字母數</span></div>
+
       </div>
 
       <div class="question">
+
         <small>題目：中文意思</small>
+
         <h3 id="spellQuestionText">準備</h3>
+
       </div>
 
       <div class="spell-answer" id="spellAnswer"></div>
+
       <div class="letter-bank" id="letterBank"></div>
+
       <div class="feedback" id="spellFeedback"></div>
 
       <div class="actions">
+
         <button class="action secondary" id="spellBackBtn">回九宮格</button>
+
         <button class="action secondary" id="spellClearBtn">清除</button>
+
         <button class="action" id="spellSubmitBtn">送出</button>
+
       </div>
+
     </section>
 
     <section class="result-card hidden" id="result">
+
       <h2 id="resultTitle">結算</h2>
+
       <div class="result-stats">
+
         <div><b id="finalScore">0</b><span>總分</span></div>
+
         <div><b id="finalAnswered">0</b><span id="finalAnsweredLabel">完成題數</span></div>
+
         <div><b id="finalLives">0</b><span id="finalLivesLabel">剩餘生命</span></div>
+
       </div>
+
       <p class="subcopy" id="resultCopy"></p>
+
       <div class="actions">
+
         <button class="action" id="restartBtn">再玩一次</button>
+
         <button class="action secondary" id="homeBtn">重新選難度</button>
+
       </div>
+
     </section>
+
   </main>
 
   <script>
+
     const labels = {
+
       easy: "簡單",
+
       normal: "普通",
+
       hard: "困難"
+
     };
 
     const matchRoundTotals = {
+
       easy: 10,
+
       normal: 20,
+
       hard: 50
+
     };
 
     const gateConfig = {
+
       easy: { stages: 20, seconds: 20 },
+
       normal: { stages: 25, seconds: 15 },
+
       hard: { stages: 30, seconds: 10 }
+
     };
 
     const spellQuestionTotals = {
+
       easy: 20,
+
       normal: 30,
+
       hard: 40
+
     };
 
     const gateCategoryBanks = {
+
       easy: [
+
         { type: "transport", words: ["car", "bus", "train", "airplane", "bicycle", "boat"] },
+
         { type: "animals", words: ["dog", "cat", "bird", "horse", "fish", "cow"] },
+
         { type: "food", words: ["apple", "banana", "bread", "rice", "milk", "chicken"] },
+
         { type: "places", words: ["school", "park", "library", "hospital", "hotel", "store"] },
+
         { type: "colors", words: ["red", "blue", "green", "yellow", "black", "white"] },
+
         { type: "weather", words: ["rain", "sunshine", "wind", "cloud", "snow", "storm"] },
+
         { type: "home", words: ["room", "kitchen", "bathroom", "window", "door", "table"] },
+
         { type: "actions", words: ["run", "walk", "swim", "read", "write", "sing"] },
+
         { type: "time", words: ["today", "tomorrow", "yesterday", "week", "month", "year"] },
+
         { type: "feelings", words: ["happy", "sad", "angry", "tired", "busy", "free"] }
+
       ],
+
       normal: [
+
         { type: "society", words: ["culture", "society", "community", "citizen", "government", "public"] },
+
         { type: "thinking", words: ["reason", "knowledge", "opinion", "evidence", "conclusion", "imagine"] },
+
         { type: "school", words: ["education", "graduate", "article", "instruction", "language", "knowledge"] },
+
         { type: "change", words: ["improve", "develop", "increase", "reduce", "decrease", "continue"] },
+
         { type: "communication", words: ["discuss", "explain", "describe", "express", "announce", "suggest"] },
+
         { type: "traits", words: ["patient", "honest", "independent", "necessary", "accurate", "active"] },
+
         { type: "emotion", words: ["confidence", "courage", "curiosity", "emotion", "respect", "attitude"] },
+
         { type: "decision", words: ["choice", "decision", "result", "factor", "effect", "goal"] },
+
         { type: "work", words: ["manage", "leadership", "organization", "method", "finance", "industry"] },
+
         { type: "risk", words: ["dangerous", "challenge", "failure", "error", "avoid", "protect"] }
+
       ],
+
       hard: [
+
         { type: "business", words: ["agenda", "contract", "conference", "deadline", "proposal", "invoice"] },
+
         { type: "finance", words: ["budget", "revenue", "surplus", "deficit", "margin", "investment"] },
+
         { type: "employment", words: ["applicant", "candidate", "employee", "employer", "recruit", "position"] },
+
         { type: "operations", words: ["logistics", "inventory", "warehouse", "procurement", "distribution", "facility"] },
+
         { type: "management", words: ["delegate", "assign", "authorize", "administer", "coordinate", "implement"] },
+
         { type: "documents", words: ["documentation", "certification", "credential", "guideline", "clause", "revision"] },
+
         { type: "commerce", words: ["supplier", "vendor", "purchase", "discount", "refund", "transaction"] },
+
         { type: "evaluation", words: ["assess", "audit", "inspection", "evaluation", "criterion", "indicator"] },
+
         { type: "strategy", words: ["forecast", "feasibility", "incentive", "strategy", "alternative", "milestone"] },
+
         { type: "legal", words: ["comply", "mandatory", "jurisdiction", "obligation", "confidential", "eligible"] }
+
       ]
+
     };
 
     const banks = {
+
       easy: [
+
         ["蘋果", "apple"], ["香蕉", "banana"], ["學校", "school"], ["老師", "teacher"], ["學生", "student"],
+
         ["朋友", "friend"], ["家庭", "family"], ["早上", "morning"], ["晚上", "evening"], ["城市", "city"],
+
         ["村莊", "village"], ["河流", "river"], ["山", "mountain"], ["海洋", "ocean"], ["天氣", "weather"],
+
         ["雨", "rain"], ["陽光", "sunshine"], ["書", "book"], ["鉛筆", "pencil"], ["桌子", "table"],
+
         ["椅子", "chair"], ["窗戶", "window"], ["門", "door"], ["食物", "food"], ["水", "water"],
+
         ["牛奶", "milk"], ["麵包", "bread"], ["米飯", "rice"], ["雞肉", "chicken"], ["魚", "fish"],
+
         ["狗", "dog"], ["貓", "cat"], ["鳥", "bird"], ["馬", "horse"], ["紅色", "red"],
+
         ["藍色", "blue"], ["綠色", "green"], ["黃色", "yellow"], ["大的", "large"], ["小的", "small"],
+
         ["快的", "fast"], ["慢的", "slow"], ["高興的", "happy"], ["難過的", "sad"], ["乾淨的", "clean"],
+
         ["髒的", "dirty"], ["打開", "open"], ["關閉", "close"], ["閱讀", "read"], ["寫", "write"],
+
         ["聽", "listen"], ["說話", "speak"], ["唱歌", "sing"], ["跳舞", "dance"], ["跑步", "run"],
+
         ["走路", "walk"], ["游泳", "swim"], ["睡覺", "sleep"], ["吃", "eat"], ["喝", "drink"],
+
         ["買", "buy"], ["賣", "sell"], ["給", "give"], ["拿", "take"], ["製作", "make"],
+
         ["幫助", "help"], ["學習", "learn"], ["教", "teach"], ["玩", "play"], ["工作", "work"],
+
         ["生日", "birthday"], ["派對", "party"], ["音樂", "music"], ["電影", "movie"], ["照片", "photo"],
+
         ["電話", "phone"], ["電腦", "computer"], ["網路", "internet"], ["公車", "bus"], ["火車", "train"],
+
         ["腳踏車", "bicycle"], ["汽車", "car"], ["飛機", "airplane"], ["車站", "station"], ["機場", "airport"],
+
         ["醫院", "hospital"], ["銀行", "bank"], ["商店", "store"], ["市場", "market"], ["餐廳", "restaurant"],
+
         ["公園", "park"], ["圖書館", "library"], ["博物館", "museum"], ["動物園", "zoo"], ["旅館", "hotel"],
+
         ["房間", "room"], ["廚房", "kitchen"], ["浴室", "bathroom"], ["花園", "garden"], ["街道", "street"],
+
         ["左邊", "left"], ["右邊", "right"], ["前面", "front"], ["後面", "back"], ["上面", "above"],
+
         ["下面", "below"], ["今天", "today"], ["明天", "tomorrow"], ["昨天", "yesterday"], ["星期", "week"],
+
         ["月份", "month"], ["年份", "year"], ["時間", "time"], ["小時", "hour"], ["分鐘", "minute"],
+
         ["熱的", "hot"], ["冷的", "cold"], ["溫暖的", "warm"], ["涼爽的", "cool"], ["新的", "new"],
+
         ["舊的", "old"], ["年輕的", "young"], ["強壯的", "strong"], ["虛弱的", "weak"], ["明亮的", "bright"],
+
         ["黑暗的", "dark"], ["容易的", "easy"], ["有趣的", "interesting"], ["無聊的", "boring"], ["甜的", "sweet"],
+
         ["酸的", "sour"], ["鹹的", "salty"], ["健康的", "healthy"], ["生病的", "sick"], ["忙碌的", "busy"],
+
         ["空閒的", "free"], ["昂貴的", "expensive"], ["便宜的", "cheap"], ["安靜的", "quiet"], ["吵鬧的", "noisy"],
+
         ["開始", "begin"], ["完成", "finish"], ["尋找", "find"], ["等待", "wait"], ["需要", "need"],
+
         ["想要", "want"], ["喜歡", "like"], ["討厭", "hate"], ["記得", "remember"], ["忘記", "forget"]
+
       ],
+
       normal: [
+
         ["冒險", "adventure"], ["環境", "environment"], ["文化", "culture"], ["社會", "society"], ["知識", "knowledge"],
+
         ["經驗", "experience"], ["機會", "opportunity"], ["責任", "responsibility"], ["選擇", "choice"], ["結果", "result"],
+
         ["原因", "reason"], ["影響", "influence"], ["改善", "improve"], ["發展", "develop"], ["比較", "compare"],
+
         ["創造", "create"], ["描述", "describe"], ["解釋", "explain"], ["建議", "suggest"], ["討論", "discuss"],
+
         ["支持", "support"], ["保護", "protect"], ["減少", "reduce"], ["增加", "increase"], ["避免", "avoid"],
+
         ["接受", "accept"], ["拒絕", "refuse"], ["允許", "allow"], ["準備", "prepare"], ["達成", "achieve"],
+
         ["成功", "success"], ["失敗", "failure"], ["信心", "confidence"], ["耐心", "patience"], ["勇氣", "courage"],
+
         ["誠實", "honesty"], ["尊重", "respect"], ["獨立的", "independent"], ["必要的", "necessary"], ["可能的", "possible"],
+
         ["重要的", "important"], ["便利的", "convenient"], ["困難的", "difficult"], ["現代的", "modern"], ["傳統的", "traditional"],
+
         ["私人的", "personal"], ["公共的", "public"], ["國際的", "international"], ["自然的", "natural"], ["危險的", "dangerous"],
+
         ["準確的", "accurate"], ["主動的", "active"], ["額外的", "additional"], ["足夠的", "adequate"], ["先進的", "advanced"],
+
         ["優點", "advantage"], ["廣告", "advertisement"], ["建議", "advice"], ["負擔得起的", "affordable"], ["同意", "agree"],
+
         ["分析", "analyze"], ["宣布", "announce"], ["道歉", "apologize"], ["申請", "apply"], ["欣賞", "appreciate"],
+
         ["適當的", "appropriate"], ["爭論", "argue"], ["安排", "arrange"], ["文章", "article"], ["注意", "attention"],
+
         ["態度", "attitude"], ["觀眾", "audience"], ["可取得的", "available"], ["平均", "average"], ["行為", "behavior"],
+
         ["利益", "benefit"], ["邊界", "border"], ["挑戰", "challenge"], ["特色", "characteristic"], ["市民", "citizen"],
+
         ["氣候", "climate"], ["合作", "cooperate"], ["溝通", "communicate"], ["社群", "community"], ["競爭", "compete"],
+
         ["抱怨", "complain"], ["複雜的", "complex"], ["結論", "conclusion"], ["狀況", "condition"], ["考慮", "consider"],
+
         ["包含", "contain"], ["持續", "continue"], ["控制", "control"], ["方便", "convenience"], ["正確的", "correct"],
+
         ["創意", "creativity"], ["好奇心", "curiosity"], ["決定", "decision"], ["減少", "decrease"], ["定義", "define"],
+
         ["證明", "demonstrate"], ["依靠", "depend"], ["詳細的", "detailed"], ["差異", "difference"], ["方向", "direction"],
+
         ["發現", "discover"], ["距離", "distance"], ["教育", "education"], ["效果", "effect"], ["努力", "effort"],
+
         ["情緒", "emotion"], ["鼓勵", "encourage"], ["精力", "energy"], ["錯誤", "error"], ["證據", "evidence"],
+
         ["範例", "example"], ["交換", "exchange"], ["運動", "exercise"], ["期待", "expect"], ["表達", "express"],
+
         ["事實", "fact"], ["因素", "factor"], ["著名的", "famous"], ["特色", "feature"], ["金融", "finance"],
+
         ["焦點", "focus"], ["外國的", "foreign"], ["自由", "freedom"], ["目標", "goal"], ["政府", "government"],
+
         ["畢業", "graduate"], ["習慣", "habit"], ["歷史", "history"], ["想像", "imagine"], ["包含", "include"],
+
         ["工業", "industry"], ["資訊", "information"], ["指示", "instruction"], ["智慧", "intelligence"], ["介紹", "introduce"],
+
         ["語言", "language"], ["領導", "leadership"], ["位置", "location"], ["管理", "manage"], ["方法", "method"],
+
         ["動機", "motivation"], ["觀察", "observe"], ["意見", "opinion"], ["組織", "organization"], ["參與", "participate"]
+
       ],
+
       hard: [
+
         ["議程", "agenda"], ["申請人", "applicant"], ["核准", "approve"], ["評估", "assess"], ["指派", "assign"],
+
         ["預算", "budget"], ["候選人", "candidate"], ["客戶", "client"], ["抱怨", "complaint"], ["會議", "conference"],
+
         ["合約", "contract"], ["截止期限", "deadline"], ["部門", "department"], ["折扣", "discount"], ["配送", "distribution"],
+
         ["效率", "efficiency"], ["員工", "employee"], ["雇主", "employer"], ["設備", "equipment"], ["估計", "estimate"],
+
         ["展覽", "exhibition"], ["設施", "facility"], ["總部", "headquarters"], ["發票", "invoice"], ["存貨", "inventory"],
+
         ["投資", "investment"], ["發票明細", "itemized"], ["製造商", "manufacturer"], ["行銷", "marketing"], ["協商", "negotiate"],
+
         ["通知", "notification"], ["營運", "operation"], ["參與者", "participant"], ["績效", "performance"], ["政策", "policy"],
+
         ["職位", "position"], ["程序", "procedure"], ["採購", "procurement"], ["生產力", "productivity"], ["提案", "proposal"],
+
         ["購買", "purchase"], ["招募", "recruit"], ["退款", "refund"], ["登記", "register"], ["代表", "representative"],
+
         ["需求", "requirement"], ["時程表", "schedule"], ["供應商", "supplier"], ["交易", "transaction"], ["倉庫", "warehouse"],
+
         ["取得", "acquire"], ["調整", "adjust"], ["管理", "administer"], ["預先的", "advance"], ["顧問", "advisor"],
+
         ["分配", "allocate"], ["替代方案", "alternative"], ["年度的", "annual"], ["任命", "appoint"], ["審計", "audit"],
+
         ["授權", "authorize"], ["自動化", "automate"], ["餘額", "balance"], ["簡報", "briefing"], ["瀏覽手冊", "brochure"],
+
         ["容量", "capacity"], ["承運人", "carrier"], ["現金流", "cashflow"], ["目錄", "catalog"], ["認證", "certification"],
+
         ["流通", "circulation"], ["澄清", "clarify"], ["條款", "clause"], ["同事", "colleague"], ["佣金", "commission"],
+
         ["商品", "commodity"], ["補償", "compensation"], ["遵守", "comply"], ["機密的", "confidential"], ["確認", "confirm"],
+
         ["共識", "consensus"], ["顧問服務", "consulting"], ["消費者", "consumer"], ["內容", "content"], ["承包商", "contractor"],
+
         ["轉換", "convert"], ["協調", "coordinate"], ["公司", "corporation"], ["憑證", "credential"], ["標準", "criterion"],
+
         ["損害", "damage"], ["赤字", "deficit"], ["委派", "delegate"], ["交付成果", "deliverable"], ["需求量", "demand"],
+
         ["折舊", "depreciation"], ["指定", "designate"], ["目的地", "destination"], ["診斷", "diagnosis"], ["差異", "discrepancy"],
+
         ["多樣化", "diversify"], ["文件", "documentation"], ["捐贈", "donation"], ["合格的", "eligible"], ["使能夠", "enable"],
+
         ["背書", "endorse"], ["企業家", "entrepreneur"], ["評估", "evaluation"], ["超過", "exceed"], ["執行主管", "executive"],
+
         ["支出", "expenditure"], ["專業知識", "expertise"], ["到期", "expire"], ["明確的", "explicit"], ["出口", "export"],
+
         ["延期", "extension"], ["可行性", "feasibility"], ["財政的", "fiscal"], ["預測", "forecast"], ["特許經營", "franchise"],
+
         ["資助", "funding"], ["保證", "guarantee"], ["指引", "guideline"], ["執行", "implement"], ["進口", "import"],
+
         ["激勵", "incentive"], ["指標", "indicator"], ["初步的", "initial"], ["檢查", "inspection"], ["保險", "insurance"],
+
         ["整合", "integrate"], ["面試", "interview"], ["司法管轄權", "jurisdiction"], ["物流", "logistics"], ["維護", "maintenance"],
+
         ["強制的", "mandatory"], ["利潤", "margin"], ["合併", "merge"], ["里程碑", "milestone"], ["義務", "obligation"],
+
         ["報價", "quotation"], ["接收者", "recipient"], ["續約", "renewal"], ["收入", "revenue"], ["修訂", "revision"],
+
         ["策略", "strategy"], ["訂閱", "subscription"], ["盈餘", "surplus"], ["投標", "tender"], ["供應商名單", "vendor"]
+
       ]
+
     };
 
     const state = {
+
       mode: "quiz",
+
       level: "easy",
+
       deck: [],
+
       index: 0,
+
       lives: 3,
+
       score: 0,
+
       answered: 0,
+
       correctTotal: 0,
+
       locked: false,
+
       current: null
+
     };
 
     const matchState = {
+
       round: 1,
+
       totalRounds: 10,
+
       seconds: 120,
+
       score: 0,
+
       matchedPairs: 0,
+
       totalMatched: 0,
+
       wrong: 0,
+
       selected: [],
+
       activePairs: [],
+
       timer: null,
+
       locked: false
+
     };
 
     const gateState = {
+
       stage: 1,
+
       totalStages: 20,
+
       secondsPerStage: 10,
+
       seconds: 10,
+
       score: 0,
+
       completed: 0,
+
       selected: [],
+
       activeCards: [],
+
       timer: null,
+
       locked: false,
+
       failed: false
+
     };
 
     const spellState = {
+
       deck: [],
+
       index: 0,
+
       lives: 3,
+
       score: 0,
+
       answered: 0,
+
       selected: [],
+
       current: null,
+
       locked: false
+
     };
 
     const home = document.querySelector("#home");
+
     const game = document.querySelector("#game");
+
     const matchGame = document.querySelector("#matchGame");
+
     const gateGame = document.querySelector("#gateGame");
+
     const spellGame = document.querySelector("#spellGame");
+
     const result = document.querySelector("#result");
+
     const board = document.querySelector("#board");
+
     const choices = document.querySelector("#choices");
+
     const feedback = document.querySelector("#feedback");
+
     const nextBtn = document.querySelector("#nextBtn");
+
     const matchBoard = document.querySelector("#matchBoard");
+
     const matchFeedback = document.querySelector("#matchFeedback");
+
     const matchNextBtn = document.querySelector("#matchNextBtn");
+
     const gateArena = document.querySelector("#gateArena");
+
     const gateFeedback = document.querySelector("#gateFeedback");
+
     const spellAnswer = document.querySelector("#spellAnswer");
+
     const letterBank = document.querySelector("#letterBank");
+
     const spellFeedback = document.querySelector("#spellFeedback");
 
     function shuffle(items) {
+
       const copy = [...items];
+
       for (let i = copy.length - 1; i > 0; i -= 1) {
+
         const j = Math.floor(Math.random() * (i + 1));
+
         [copy[i], copy[j]] = [copy[j], copy[i]];
+
       }
+
       return copy;
+
     }
 
     function renderBoard() {
+
       board.innerHTML = "";
+
       for (let i = 1; i <= 9; i += 1) {
+
         const isOpen = i <= 4;
+
         const tile = document.createElement("button");
+
         tile.className = `tile${isOpen ? " active" : ""}`;
+
         tile.type = "button";
+
         tile.disabled = !isOpen;
+
         tile.innerHTML = `
+
           <span class="tile-number">${i}</span>
+
           <span class="tile-label">${i === 1 ? "單字快打" : i === 2 ? "配對消消樂" : i === 3 ? "斬殺線" : i === 4 ? "單字拼圖" : "尚未開放"}</span>
+
           ${isOpen ? "" : '<span class="lock" aria-hidden="true"></span>'}
+
         `;
-        if (i === 1) {
-          tile.addEventListener("click", startGame);
-        }
-        if (i === 2) {
-          tile.addEventListener("click", startMatchGame);
-        }
-        if (i === 3) {
-          tile.addEventListener("click", startGateGame);
-        }
-        if (i === 4) {
-          tile.addEventListener("click", startSpellGame);
-        }
+
+        if (i === 1) tile.addEventListener("click", startGame);
+
+        if (i === 2) tile.addEventListener("click", startMatchGame);
+
+        if (i === 3) tile.addEventListener("click", startGateGame);
+
+        if (i === 4) tile.addEventListener("click", startSpellGame);
+
         board.appendChild(tile);
+
       }
+
     }
 
     function startGame() {
+
       stopMatchTimer();
+
       stopGateTimer();
+
       state.mode = "quiz";
+
       const deck = shuffle(banks[state.level]).slice(0, 50).map(([zh, en]) => ({ zh, en }));
+
       state.deck = deck;
+
       state.index = 0;
+
       state.lives = 3;
+
       state.score = 0;
+
       state.answered = 0;
+
       state.correctTotal = 0;
+
       state.locked = false;
+
       home.classList.add("hidden");
+
       result.classList.add("hidden");
+
       matchGame.classList.add("hidden");
+
       gateGame.classList.add("hidden");
+
       spellGame.classList.add("hidden");
+
       game.classList.remove("hidden");
+
       document.querySelector("#gameTitle").textContent = "第一宮格：單字快打";
+
       document.querySelector("#levelBadge").textContent = labels[state.level];
+
       renderQuestion();
+
     }
 
     function makeOptions(answer) {
+
       const wrongs = shuffle(banks[state.level].map((item) => item[1]).filter((word) => word !== answer)).slice(0, 2);
+
       return shuffle([answer, ...wrongs]);
+
     }
 
     function renderQuestion() {
+
       state.locked = false;
+
       nextBtn.disabled = true;
+
       feedback.textContent = "";
+
       state.current = state.deck[state.index];
+
       document.querySelector("#questionText").textContent = state.current.zh;
+
       document.querySelector("#lifeText").textContent = state.lives;
+
       document.querySelector("#scoreText").textContent = state.score;
+
       document.querySelector("#countText").textContent = `${state.index + 1} / ${state.deck.length}`;
+
       document.querySelector("#bonusText").textContent = `${state.correctTotal % 5} / 5`;
 
       choices.innerHTML = "";
+
       makeOptions(state.current.en).forEach((word) => {
+
         const button = document.createElement("button");
+
         button.className = "choice";
+
         button.type = "button";
+
         button.textContent = word;
+
         button.addEventListener("click", () => choose(button, word));
+
         choices.appendChild(button);
+
       });
+
     }
 
     function choose(button, word) {
+
       if (state.locked) return;
+
       state.locked = true;
+
       state.answered += 1;
 
       const isCorrect = word === state.current.en;
+
       const buttons = [...choices.querySelectorAll(".choice")];
+
       buttons.forEach((item) => {
+
         item.disabled = true;
+
         if (item.textContent === state.current.en) item.classList.add("correct");
+
       });
 
       if (isCorrect) {
+
         state.score += 2;
+
         state.correctTotal += 1;
+
         const gainedLife = state.correctTotal % 5 === 0;
+
         if (gainedLife) state.lives += 1;
+
         feedback.textContent = gainedLife ? "答對！連續累積 5 題正確，加 1 條命。" : "答對！拿下 2 分。";
+
       } else {
+
         state.lives -= 1;
+
         button.classList.add("wrong");
+
         feedback.textContent = `答錯了，正解是 ${state.current.en}。`;
+
       }
 
       document.querySelector("#lifeText").textContent = state.lives;
+
       document.querySelector("#scoreText").textContent = state.score;
+
       document.querySelector("#bonusText").textContent = `${state.correctTotal % 5} / 5`;
 
       if (state.lives <= 0 || state.index >= state.deck.length - 1) {
+
         nextBtn.textContent = "查看結算";
+
       } else {
+
         nextBtn.textContent = "下一題";
+
       }
+
       nextBtn.disabled = false;
+
     }
 
     function finishGame() {
+
       game.classList.add("hidden");
+
       matchGame.classList.add("hidden");
+
       gateGame.classList.add("hidden");
+
       spellGame.classList.add("hidden");
+
       result.classList.remove("hidden");
+
       const fullClear = state.answered === state.deck.length && state.lives > 0;
+
       document.querySelector("#resultTitle").textContent = fullClear ? "闖關完成" : "遊戲結算";
+
       document.querySelector("#finalScore").textContent = state.score;
+
       document.querySelector("#finalAnswered").textContent = state.answered;
+
       document.querySelector("#finalAnsweredLabel").textContent = "完成題數";
+
       document.querySelector("#finalLives").textContent = Math.max(state.lives, 0);
+
       document.querySelector("#finalLivesLabel").textContent = "剩餘生命";
+
       document.querySelector("#resultCopy").textContent =
+
         `你選擇的是「${labels[state.level]}」難度。本局最高 100 分，你拿到 ${state.score} 分，完成 ${state.answered} 題。`;
+
     }
 
     function startGateGame() {
+
       stopMatchTimer();
+
       stopGateTimer();
+
       state.mode = "gate";
+
       const config = gateConfig[state.level];
+
       gateState.stage = 1;
+
       gateState.totalStages = config.stages;
+
       gateState.secondsPerStage = config.seconds;
+
       gateState.seconds = config.seconds;
+
       gateState.score = 0;
+
       gateState.completed = 0;
+
       gateState.selected = [];
+
       gateState.activeCards = [];
+
       gateState.locked = false;
+
       gateState.failed = false;
+
       home.classList.add("hidden");
+
       game.classList.add("hidden");
+
       matchGame.classList.add("hidden");
+
       result.classList.add("hidden");
+
       gateGame.classList.remove("hidden");
+
       document.querySelector("#gateLevelBadge").textContent = labels[state.level];
+
       startGateStage();
+
     }
 
     function startGateStage() {
+
       stopGateTimer();
+
       gateState.seconds = gateState.secondsPerStage;
+
       gateState.selected = [];
+
       gateState.locked = false;
+
       gateState.failed = false;
+
       gateFeedback.textContent = "選出 2 張同類型英文卡。";
+
       buildGateCards();
+
       updateGateHud();
+
       gateState.timer = window.setInterval(() => {
+
         gateState.seconds -= 1;
+
         updateGateHud();
+
         if (gateState.seconds <= 0) {
+
           failGateGame("時間耗盡，卡牌越過斬殺線。");
+
         }
+
       }, 1000);
+
     }
 
     function buildGateCards() {
+
       const categories = shuffle(gateCategoryBanks[state.level]).slice(0, 4);
+
       const laneXs = [3, 15, 27, 39, 51, 63, 75, 84];
+
       const cards = shuffle(categories.flatMap((category) =>
+
         shuffle(category.words).slice(0, 2).map((word) => ({
+
           type: category.type,
+
           text: word
+
         }))
+
       )).map((card, index) => ({
+
         ...card,
+
         x: laneXs[index],
+
         delay: index * 0.16
+
       }));
+
       gateState.activeCards = cards;
+
       renderGateCards();
+
     }
 
     function renderGateCards() {
+
       gateArena.querySelectorAll(".fall-card").forEach((card) => card.remove());
+
       gateState.activeCards.forEach((card) => {
+
         const button = document.createElement("button");
+
         button.className = "fall-card";
+
         button.type = "button";
+
         button.dataset.type = card.type;
+
         button.dataset.word = card.text;
+
         button.style.setProperty("--x", `${card.x}%`);
+
         button.style.setProperty("--dur", `${gateState.secondsPerStage}s`);
+
         button.style.setProperty("--delay", `${card.delay}s`);
+
         button.innerHTML = `<span class="gate-word">${card.text}</span>`;
+
         button.addEventListener("click", () => chooseGateCard(button));
+
         button.addEventListener("animationend", () => {
+
           if (!gateState.locked && !gateState.failed) {
+
             failGateGame("有卡牌越過斬殺線，挑戰失敗。");
+
           }
+
         });
+
         gateArena.appendChild(button);
+
       });
+
     }
 
     function chooseGateCard(button) {
+
       if (gateState.locked || gateState.failed || button.classList.contains("selected")) return;
+
       button.classList.add("selected");
+
       gateState.selected.push(button);
+
       document.querySelector("#gateNeedText").textContent = 2 - gateState.selected.length;
+
       if (gateState.selected.length < 2) return;
 
       const [first, second] = gateState.selected;
+
       const isPair = first.dataset.type === second.dataset.type && first.dataset.word !== second.dataset.word;
+
       if (isPair) {
+
         passGateStage();
+
         return;
+
       }
 
       first.classList.add("wrong");
+
       second.classList.add("wrong");
+
       gateFeedback.textContent = "不是同一組，快重新選。";
+
       window.setTimeout(() => {
+
         first.classList.remove("selected", "wrong");
+
         second.classList.remove("selected", "wrong");
+
         gateState.selected = [];
+
         document.querySelector("#gateNeedText").textContent = 2;
+
       }, 320);
+
     }
 
     function passGateStage() {
+
       gateState.locked = true;
+
       stopGateTimer();
+
       const bonus = Math.max(0, gateState.seconds);
+
       gateState.score += 10 + bonus;
+
       gateState.completed += 1;
+
       gateFeedback.textContent = `斬殺成功！本關 +${10 + bonus} 分。`;
+
       gateArena.querySelectorAll(".fall-card").forEach((card) => {
+
         card.classList.add("cleared");
+
         card.disabled = true;
+
       });
+
       updateGateHud();
+
       window.setTimeout(() => {
+
         if (gateState.stage >= gateState.totalStages) {
+
           finishGateGame(true);
+
           return;
+
         }
+
         gateState.stage += 1;
+
         startGateStage();
+
       }, 650);
+
     }
 
     function failGateGame(message) {
+
       if (gateState.failed) return;
+
       gateState.failed = true;
+
       gateState.locked = true;
+
       stopGateTimer();
+
       gateFeedback.textContent = message;
+
       gateArena.querySelectorAll(".fall-card").forEach((card) => {
+
         card.style.animationPlayState = "paused";
+
         card.disabled = true;
+
       });
+
       window.setTimeout(() => finishGateGame(false), 850);
+
     }
 
     function updateGateHud() {
+
       document.querySelector("#gateStageText").textContent = `${gateState.stage} / ${gateState.totalStages}`;
+
       document.querySelector("#gateTimeText").textContent = Math.max(0, gateState.seconds);
+
       document.querySelector("#gateScoreText").textContent = gateState.score;
+
       document.querySelector("#gateNeedText").textContent = 2 - gateState.selected.length;
+
     }
 
     function stopGateTimer() {
+
       if (gateState.timer) {
+
         window.clearInterval(gateState.timer);
+
         gateState.timer = null;
+
       }
+
     }
 
     function finishGateGame(cleared) {
+
       stopGateTimer();
+
       gateGame.classList.add("hidden");
+
       result.classList.remove("hidden");
+
       document.querySelector("#resultTitle").textContent = cleared ? "斬殺線全破" : "斬殺線挑戰失敗";
+
       document.querySelector("#finalScore").textContent = gateState.score;
+
       document.querySelector("#finalAnswered").textContent = gateState.completed;
+
       document.querySelector("#finalAnsweredLabel").textContent = "通過關卡";
+
       document.querySelector("#finalLives").textContent = `${gateState.stage} / ${gateState.totalStages}`;
+
       document.querySelector("#finalLivesLabel").textContent = "抵達關卡";
+
       document.querySelector("#resultCopy").textContent =
+
         `你選擇的是「${labels[state.level]}」難度。每關 ${gateState.secondsPerStage} 秒，共 ${gateState.totalStages} 關；本局通過 ${gateState.completed} 關，總分 ${gateState.score} 分。`;
+
     }
 
     function startSpellGame() {
+
       stopMatchTimer();
+
       stopGateTimer();
+
       state.mode = "spell";
+
       const total = spellQuestionTotals[state.level];
+
       spellState.deck = shuffle(banks[state.level])
+
         .filter(([, en]) => /^[a-z]+$/.test(en))
+
         .slice(0, total)
+
         .map(([zh, en]) => ({ zh, en }));
+
       spellState.index = 0;
+
       spellState.lives = 3;
+
       spellState.score = 0;
+
       spellState.answered = 0;
+
       spellState.selected = [];
+
       spellState.current = null;
+
       spellState.locked = false;
+
       home.classList.add("hidden");
+
       game.classList.add("hidden");
+
       matchGame.classList.add("hidden");
+
       gateGame.classList.add("hidden");
+
       result.classList.add("hidden");
+
       spellGame.classList.remove("hidden");
+
       document.querySelector("#spellLevelBadge").textContent = labels[state.level];
+
       renderSpellQuestion();
+
     }
 
     function renderSpellQuestion() {
+
       spellState.locked = false;
+
       spellState.selected = [];
+
       spellState.current = spellState.deck[spellState.index];
+
       document.querySelector("#spellQuestionText").textContent = spellState.current.zh;
+
       spellFeedback.textContent = "點選字母方塊，拼出正確英文單字。";
+
       renderSpellAnswer();
+
       renderLetterBank();
+
       updateSpellHud();
+
     }
 
     function renderSpellAnswer() {
+
       spellAnswer.innerHTML = "";
+
       const letters = spellState.current.en.split("");
+
       letters.forEach((_, index) => {
+
         const slot = document.createElement("span");
+
         slot.className = "spell-slot";
+
         slot.textContent = spellState.selected[index]?.letter || "";
+
         spellAnswer.appendChild(slot);
+
       });
+
     }
 
     function renderLetterBank() {
+
       letterBank.innerHTML = "";
+
       const answerLetters = spellState.current.en.split("").map((letter, index) => ({ letter, index, answer: true }));
+
       const targetCount = Math.max(answerLetters.length * 5, answerLetters.length);
+
       const sourceLetters = banks[state.level]
+
         .flatMap(([, en]) => en.split(""))
+
         .filter((letter) => /^[a-z]$/.test(letter));
+
       const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+
       const distractors = [];
 
       while (answerLetters.length + distractors.length < targetCount) {
+
         const source = sourceLetters.length ? sourceLetters : alphabet;
+
         const letter = source[Math.floor(Math.random() * source.length)];
+
         distractors.push({ letter, index: `d${distractors.length}`, answer: false });
+
       }
 
       const letters = shuffle([...answerLetters, ...distractors]);
+
       letters.forEach((item) => {
+
         const button = document.createElement("button");
+
         button.className = "letter-tile";
+
         button.type = "button";
+
         button.textContent = item.letter;
+
         button.dataset.index = item.index;
+
         button.dataset.answer = item.answer ? "true" : "false";
+
         button.addEventListener("click", () => chooseLetter(button, item));
+
         letterBank.appendChild(button);
+
       });
+
     }
 
     function chooseLetter(button, item) {
+
       if (spellState.locked || button.disabled) return;
+
       if (spellState.selected.length >= spellState.current.en.length) return;
+
       button.disabled = true;
+
       spellState.selected.push({ letter: item.letter, index: item.index, button });
+
       renderSpellAnswer();
+
       updateSpellHud();
+
     }
 
     function clearSpellAnswer() {
+
       spellState.selected.forEach((item) => {
+
         item.button.disabled = false;
+
       });
+
       spellState.selected = [];
+
       renderSpellAnswer();
+
       updateSpellHud();
+
     }
 
     function submitSpellAnswer() {
+
       if (spellState.locked) return;
+
       const answer = spellState.selected.map((item) => item.letter).join("");
+
       if (answer.length !== spellState.current.en.length) {
+
         spellFeedback.textContent = "字母還沒拼完。";
+
         return;
+
       }
 
       spellState.locked = true;
+
       spellState.answered += 1;
+
       if (answer === spellState.current.en) {
+
         spellState.score += 2;
+
         spellFeedback.textContent = "拼對了，拿下 2 分。";
+
       } else {
+
         spellState.lives -= 1;
+
         spellFeedback.textContent = `拼錯了，正確答案是 ${spellState.current.en}。`;
+
       }
+
       updateSpellHud();
 
       window.setTimeout(() => {
+
         if (spellState.lives <= 0 || spellState.index >= spellState.deck.length - 1) {
+
           finishSpellGame();
+
           return;
+
         }
+
         spellState.index += 1;
+
         renderSpellQuestion();
+
       }, 850);
+
     }
 
     function updateSpellHud() {
+
       document.querySelector("#spellLifeText").textContent = spellState.lives;
+
       document.querySelector("#spellScoreText").textContent = spellState.score;
+
       document.querySelector("#spellCountText").textContent = `${spellState.index + 1} / ${spellState.deck.length}`;
+
       document.querySelector("#spellLengthText").textContent = `${spellState.selected.length} / ${spellState.current?.en.length || 0}`;
+
     }
 
     function finishSpellGame() {
+
       spellGame.classList.add("hidden");
+
       result.classList.remove("hidden");
+
       const fullClear = spellState.answered === spellState.deck.length && spellState.lives > 0;
+
       document.querySelector("#resultTitle").textContent = fullClear ? "單字拼圖完成" : "單字拼圖結算";
+
       document.querySelector("#finalScore").textContent = spellState.score;
+
       document.querySelector("#finalAnswered").textContent = spellState.answered;
+
       document.querySelector("#finalAnsweredLabel").textContent = "完成題數";
+
       document.querySelector("#finalLives").textContent = Math.max(spellState.lives, 0);
+
       document.querySelector("#finalLivesLabel").textContent = "剩餘生命";
+
       document.querySelector("#resultCopy").textContent =
+
         `你選擇的是「${labels[state.level]}」難度。本局共 ${spellState.deck.length} 題，每題 2 分；你完成 ${spellState.answered} 題，總分 ${spellState.score} 分。`;
+
     }
 
     function startMatchGame() {
+
       stopMatchTimer();
+
       stopGateTimer();
+
       state.mode = "match";
+
       matchState.round = 1;
+
       matchState.totalRounds = matchRoundTotals[state.level];
+
       matchState.seconds = 120;
+
       matchState.score = 0;
+
       matchState.matchedPairs = 0;
+
       matchState.totalMatched = 0;
+
       matchState.wrong = 0;
+
       matchState.selected = [];
+
       matchState.activePairs = [];
+
       matchState.locked = false;
+
       home.classList.add("hidden");
+
       game.classList.add("hidden");
+
       gateGame.classList.add("hidden");
+
       spellGame.classList.add("hidden");
+
       result.classList.add("hidden");
+
       matchGame.classList.remove("hidden");
+
       document.querySelector("#matchLevelBadge").textContent = labels[state.level];
+
       startMatchRound();
+
     }
 
     function startMatchRound() {
+
       stopMatchTimer();
+
       matchState.seconds = 120;
+
       matchState.matchedPairs = 0;
+
       matchState.selected = [];
+
       matchState.locked = false;
+
       matchNextBtn.disabled = true;
+
       matchNextBtn.textContent = matchState.round >= matchState.totalRounds ? "查看結算" : "下一輪";
+
       matchFeedback.textContent = "找出 6 組中英配對。";
+
       buildMatchCards();
+
       updateMatchHud();
+
       matchState.timer = window.setInterval(() => {
+
         matchState.seconds -= 1;
+
         updateMatchHud();
+
         if (matchState.seconds <= 0) {
+
           endMatchRound("時間到，這輪結束。");
+
         }
+
       }, 1000);
+
     }
 
     function buildMatchCards(keepMatched = []) {
+
       const kept = keepMatched.map((pair) => ({ ...pair, matched: true }));
+
       const needed = 6 - kept.length;
+
       const blocked = new Set(kept.map((pair) => pair.en));
+
       const fresh = shuffle(banks[state.level])
+
         .filter(([, en]) => !blocked.has(en))
+
         .slice(0, needed)
+
         .map(([zh, en]) => ({ zh, en, matched: false }));
+
       matchState.activePairs = [...kept, ...fresh];
+
       renderMatchCards();
+
     }
 
     function renderMatchCards() {
+
       const cards = shuffle(matchState.activePairs.flatMap((pair) => [
+
         { id: pair.en, text: pair.zh, kind: "中文", matched: pair.matched },
+
         { id: pair.en, text: pair.en, kind: "English", matched: pair.matched }
+
       ]));
+
       matchBoard.innerHTML = "";
+
       cards.forEach((card) => {
+
         const button = document.createElement("button");
+
         button.className = `match-card${card.matched ? " matched" : ""}`;
+
         button.type = "button";
+
         button.disabled = card.matched;
+
         button.dataset.id = card.id;
+
         button.dataset.kind = card.kind;
+
         button.innerHTML = `<span class="match-kind">${card.kind}</span><span class="match-word">${card.text}</span>`;
+
         button.addEventListener("click", () => chooseMatch(button));
+
         matchBoard.appendChild(button);
+
       });
+
     }
 
     function chooseMatch(button) {
+
       if (matchState.locked || button.classList.contains("matched") || button.classList.contains("selected")) return;
+
       button.classList.add("selected");
+
       matchState.selected.push(button);
+
       if (matchState.selected.length < 2) return;
 
       matchState.locked = true;
+
       const [first, second] = matchState.selected;
+
       const isPair = first.dataset.id === second.dataset.id && first.dataset.kind !== second.dataset.kind;
+
       if (isPair) {
+
         window.setTimeout(() => {
+
           markPairMatched(first.dataset.id);
+
           matchState.score += 2;
+
           matchState.matchedPairs += 1;
+
           matchState.totalMatched += 1;
+
           matchFeedback.textContent = "配對成功，拿下 2 分。";
+
           matchState.selected = [];
+
           matchState.locked = false;
+
           updateMatchHud();
+
           if (matchState.matchedPairs >= 6) {
+
             endMatchRound("本輪完成。");
+
           }
+
         }, 180);
+
         return;
+
       }
 
       first.classList.add("wrong");
+
       second.classList.add("wrong");
+
       matchState.score = Math.max(0, matchState.score - 1);
+
       matchState.wrong += 1;
+
       matchFeedback.textContent = "配錯了，扣 1 分，未消除的卡片換一批。";
+
       window.setTimeout(() => {
+
         const matched = matchState.activePairs.filter((pair) => pair.matched);
+
         matchState.selected = [];
+
         matchState.locked = false;
+
         buildMatchCards(matched);
+
         updateMatchHud();
+
       }, 620);
+
     }
 
     function markPairMatched(id) {
+
       matchState.activePairs = matchState.activePairs.map((pair) =>
+
         pair.en === id ? { ...pair, matched: true } : pair
+
       );
+
       [...matchBoard.querySelectorAll(`[data-id="${CSS.escape(id)}"]`)].forEach((card) => {
+
         card.classList.remove("selected");
+
         card.classList.add("matched");
+
         card.disabled = true;
+
       });
+
     }
 
     function endMatchRound(message) {
+
       stopMatchTimer();
+
       matchState.locked = true;
+
       matchFeedback.textContent = message;
+
       matchNextBtn.disabled = false;
+
       matchNextBtn.textContent = matchState.round >= matchState.totalRounds ? "查看結算" : "下一輪";
+
       [...matchBoard.querySelectorAll(".match-card")].forEach((card) => {
+
         card.disabled = true;
+
       });
+
     }
 
     function updateMatchHud() {
+
       document.querySelector("#matchRoundText").textContent = `${matchState.round} / ${matchState.totalRounds}`;
+
       document.querySelector("#matchTimeText").textContent = matchState.seconds;
+
       document.querySelector("#matchPairText").textContent = `${matchState.matchedPairs} / 6`;
+
       document.querySelector("#matchScoreText").textContent = matchState.score;
+
     }
 
     function stopMatchTimer() {
+
       if (matchState.timer) {
+
         window.clearInterval(matchState.timer);
+
         matchState.timer = null;
+
       }
+
     }
 
     function finishMatchGame() {
+
       stopMatchTimer();
+
       matchGame.classList.add("hidden");
+
       result.classList.remove("hidden");
+
       document.querySelector("#resultTitle").textContent = "配對消消樂結算";
+
       document.querySelector("#finalScore").textContent = matchState.score;
+
       document.querySelector("#finalAnswered").textContent = matchState.totalMatched;
+
       document.querySelector("#finalAnsweredLabel").textContent = "成功配對";
+
       document.querySelector("#finalLives").textContent = `${matchState.round} / ${matchState.totalRounds}`;
+
       document.querySelector("#finalLivesLabel").textContent = "完成輪數";
+
       document.querySelector("#resultCopy").textContent =
+
         `你選擇的是「${labels[state.level]}」難度。每輪 2 分鐘，本局完成 ${matchState.totalMatched} 組配對，錯配 ${matchState.wrong} 次，總分 ${matchState.score} 分。`;
+
     }
 
     document.querySelectorAll(".difficulty").forEach((button) => {
+
       button.addEventListener("click", () => {
+
         state.level = button.dataset.level;
+
         document.querySelectorAll(".difficulty").forEach((item) => item.classList.remove("active"));
+
         button.classList.add("active");
+
         document.querySelector("#selectedLabel").textContent = labels[state.level];
+
       });
+
     });
 
     nextBtn.addEventListener("click", () => {
+
       if (state.lives <= 0 || state.index >= state.deck.length - 1) {
+
         finishGame();
+
         return;
+
       }
+
       state.index += 1;
+
       renderQuestion();
+
     });
 
     document.querySelector("#backBtn").addEventListener("click", () => {
+
       game.classList.add("hidden");
+
       home.classList.remove("hidden");
+
     });
 
     document.querySelector("#matchBackBtn").addEventListener("click", () => {
+
       stopMatchTimer();
+
       matchGame.classList.add("hidden");
+
       home.classList.remove("hidden");
+
     });
 
     document.querySelector("#gateBackBtn").addEventListener("click", () => {
+
       stopGateTimer();
+
       gateGame.classList.add("hidden");
+
       home.classList.remove("hidden");
+
     });
 
     document.querySelector("#spellBackBtn").addEventListener("click", () => {
+
       spellGame.classList.add("hidden");
+
       home.classList.remove("hidden");
+
     });
 
     document.querySelector("#spellClearBtn").addEventListener("click", clearSpellAnswer);
+
     document.querySelector("#spellSubmitBtn").addEventListener("click", submitSpellAnswer);
 
     matchNextBtn.addEventListener("click", () => {
+
       if (matchState.round >= matchState.totalRounds) {
+
         finishMatchGame();
+
         return;
+
       }
+
       matchState.round += 1;
+
       startMatchRound();
+
     });
 
     document.querySelector("#restartBtn").addEventListener("click", () => {
+
       if (state.mode === "match") {
+
         startMatchGame();
+
         return;
+
       }
+
       if (state.mode === "gate") {
+
         startGateGame();
+
         return;
+
       }
+
       if (state.mode === "spell") {
+
         startSpellGame();
+
         return;
+
       }
+
       startGame();
+
     });
 
     document.querySelector("#homeBtn").addEventListener("click", () => {
+
       stopMatchTimer();
+
       stopGateTimer();
+
       result.classList.add("hidden");
+
       home.classList.remove("hidden");
+
     });
 
     renderBoard();
 
     if ("serviceWorker" in navigator && location.protocol !== "file:") {
+
       window.addEventListener("load", () => {
+
         navigator.serviceWorker.register("./sw.js").catch(() => {});
+
       });
+
     }
+
   </script>
+
 </body>
+
 </html>
