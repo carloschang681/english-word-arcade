@@ -988,6 +988,136 @@
 
     }
 
+    .river-arena {
+
+      position: relative;
+
+      min-height: 420px;
+
+      margin-top: 14px;
+
+      border: 4px solid var(--line);
+
+      background:
+
+        linear-gradient(180deg, rgba(77, 142, 202, .18) 0%, rgba(125, 224, 178, .22) 100%),
+
+        #fffdf4;
+
+      background-size: 32px 32px;
+
+      padding: 16px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      box-shadow: inset 0 0 0 3px rgba(24, 32, 29, .06);
+
+    }
+
+    .river-bank {
+
+      width: 100%;
+
+      padding: 10px 14px;
+
+      border: 3px solid var(--line);
+
+      background: var(--panel);
+
+      box-shadow: 4px 4px 0 var(--line);
+
+      font-weight: 1000;
+
+      text-align: center;
+
+      font-size: 15px;
+
+    }
+
+    .river-grid {
+
+      display: grid;
+
+      grid-template-columns: repeat(4, 1fr);
+
+      gap: 10px;
+
+      width: 100%;
+
+      max-width: 420px;
+
+      margin: auto 0;
+
+    }
+
+    .stone {
+
+      aspect-ratio: 1;
+
+      border: 3px solid var(--line);
+
+      background: #fffdf4;
+
+      box-shadow: 4px 4px 0 var(--line);
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-family: Georgia, "Times New Roman", serif;
+
+      font-size: 26px;
+
+      font-weight: 900;
+
+      cursor: pointer;
+
+      text-transform: uppercase;
+
+      transition: transform .14s ease, background .14s ease, box-shadow .14s ease;
+
+    }
+
+    .stone:hover:not(:disabled) {
+
+      transform: translate(-2px, -2px) rotate(-1deg);
+
+      background: var(--yellow);
+
+      box-shadow: 6px 6px 0 var(--line);
+
+    }
+
+    .stone.stepped {
+
+      background: var(--blue);
+
+      color: #fffdf4;
+
+    }
+
+    .stone.wrong {
+
+      background: var(--coral);
+
+      color: #fff8df;
+
+    }
+
+    .stone:disabled {
+
+      cursor: default;
+
+    }
+
     .gate-kind {
 
       display: inline-flex;
@@ -1390,7 +1520,7 @@
 
         <p class="headline">看中文，拍下正確英文卡。</p>
 
-        <p class="subcopy">第一宮格是 3 選 1 單字快打，第二宮格是中英配對消消樂，第三宮格是英文同類卡牌斬殺線。先選難度，再進入關卡。</p>
+        <p class="subcopy">第一格單字快打、第二格配對消消樂、第三格斬殺線、第四格單字拼圖、第五格單字過河。先選難度，再進入關卡。</p>
 
         <div class="difficulty-grid" aria-label="難度選擇">
 
@@ -1620,6 +1750,58 @@
 
     </section>
 
+    <section class="game-card hidden" id="riverGame" aria-live="polite">
+
+      <div class="panel-title">
+
+        <h2>第五宮格：單字過河</h2>
+
+        <span class="tag" id="riverLevelBadge">簡單</span>
+
+      </div>
+
+      <div class="hud">
+
+        <div class="meter"><b id="riverLifeText">3</b><span>生命</span></div>
+
+        <div class="meter"><b id="riverScoreText">0</b><span>分數</span></div>
+
+        <div class="meter"><b id="riverCountText">1 / 15</b><span>關卡</span></div>
+
+        <div class="meter"><b id="riverStepText">0 / 0</b><span>步數進度</span></div>
+
+      </div>
+
+      <div class="question">
+
+        <small>目標中文題目（終點）：請依序踩過河中正確字母石頭</small>
+
+        <h3 id="riverQuestionText">準備</h3>
+
+      </div>
+
+      <div class="river-arena">
+
+        <div class="river-bank" id="riverGoalBank">🏁 終點：依序拼出單字</div>
+
+        <div class="river-grid" id="riverGrid"></div>
+
+        <div class="river-bank" id="riverStartBank">🌊 起點：點擊第一個字母出發</div>
+
+      </div>
+
+      <div class="feedback" id="riverFeedback"></div>
+
+      <div class="actions">
+
+        <button class="action secondary" id="riverBackBtn">回九宮格</button>
+
+        <button class="action secondary" id="riverResetBtn">重新開始本關</button>
+
+      </div>
+
+    </section>
+
     <section class="result-card hidden" id="result">
 
       <h2 id="resultTitle">結算</h2>
@@ -1687,6 +1869,16 @@
       normal: 30,
 
       hard: 40
+
+    };
+
+    const riverConfig = {
+
+      easy: { total: 15 },
+
+      normal: { total: 20 },
+
+      hard: { total: 25 }
 
     };
 
@@ -2058,6 +2250,28 @@
 
     };
 
+    const riverState = {
+
+      deck: [],
+
+      index: 0,
+
+      lives: 3,
+
+      score: 0,
+
+      answered: 0,
+
+      current: null,
+
+      currentStep: 0,
+
+      stones: [],
+
+      locked: false
+
+    };
+
     const home = document.querySelector("#home");
 
     const game = document.querySelector("#game");
@@ -2067,6 +2281,8 @@
     const gateGame = document.querySelector("#gateGame");
 
     const spellGame = document.querySelector("#spellGame");
+
+    const riverGame = document.querySelector("#riverGame");
 
     const result = document.querySelector("#result");
 
@@ -2094,6 +2310,10 @@
 
     const spellFeedback = document.querySelector("#spellFeedback");
 
+    const riverGrid = document.querySelector("#riverGrid");
+
+    const riverFeedback = document.querySelector("#riverFeedback");
+
     function shuffle(items) {
 
       const copy = [...items];
@@ -2116,7 +2336,7 @@
 
       for (let i = 1; i <= 9; i += 1) {
 
-        const isOpen = i <= 4;
+        const isOpen = i <= 5;
 
         const tile = document.createElement("button");
 
@@ -2130,7 +2350,7 @@
 
           <span class="tile-number">${i}</span>
 
-          <span class="tile-label">${i === 1 ? "單字快打" : i === 2 ? "配對消消樂" : i === 3 ? "斬殺線" : i === 4 ? "單字拼圖" : "尚未開放"}</span>
+          <span class="tile-label">${i === 1 ? "單字快打" : i === 2 ? "配對消消樂" : i === 3 ? "斬殺線" : i === 4 ? "單字拼圖" : i === 5 ? "單字過河" : "尚未開放"}</span>
 
           ${isOpen ? "" : '<span class="lock" aria-hidden="true"></span>'}
 
@@ -2143,6 +2363,8 @@
         if (i === 3) tile.addEventListener("click", startGateGame);
 
         if (i === 4) tile.addEventListener("click", startSpellGame);
+
+        if (i === 5) tile.addEventListener("click", startRiverGame);
 
         board.appendChild(tile);
 
@@ -2183,6 +2405,8 @@
       gateGame.classList.add("hidden");
 
       spellGame.classList.add("hidden");
+
+      riverGame.classList.add("hidden");
 
       game.classList.remove("hidden");
 
@@ -2314,6 +2538,8 @@
 
       spellGame.classList.add("hidden");
 
+      riverGame.classList.add("hidden");
+
       result.classList.remove("hidden");
 
       const fullClear = state.answered === state.deck.length && state.lives > 0;
@@ -2372,6 +2598,10 @@
 
       matchGame.classList.add("hidden");
 
+      spellGame.classList.add("hidden");
+
+      riverGame.classList.add("hidden");
+
       result.classList.add("hidden");
 
       gateGame.classList.remove("hidden");
@@ -2420,8 +2650,6 @@
 
       const categories = shuffle(gateCategoryBanks[state.level]).slice(0, 4);
 
-      // 改為安全分散的 8 個橫向百分比位置，確保手機上不會擠在一起
-
       const laneXs = [2, 14, 26, 38, 50, 62, 74, 86];
 
       const cards = shuffle(categories.flatMap((category) =>
@@ -2440,7 +2668,7 @@
 
         x: laneXs[index],
 
-        delay: (index % 4) * 0.18 // 分批下落，錯開時間
+        delay: (index % 4) * 0.18
 
       }));
 
@@ -2694,6 +2922,8 @@
 
       gateGame.classList.add("hidden");
 
+      riverGame.classList.add("hidden");
+
       result.classList.add("hidden");
 
       spellGame.classList.remove("hidden");
@@ -2918,6 +3148,252 @@
 
     }
 
+    // 第五宮格：單字過河（依難度題庫、一題 5 分、死亡後計分）
+
+    function startRiverGame() {
+
+      stopMatchTimer();
+
+      stopGateTimer();
+
+      state.mode = "river";
+
+      const config = riverConfig[state.level];
+
+      riverState.deck = shuffle(banks[state.level])
+
+        .filter(([, en]) => /^[a-z]+$/.test(en) && en.length >= 3 && en.length <= 6)
+
+        .slice(0, config.total)
+
+        .map(([zh, en]) => ({ zh, en }));
+
+      riverState.index = 0;
+
+      riverState.lives = 3;
+
+      riverState.score = 0;
+
+      riverState.answered = 0;
+
+      riverState.locked = false;
+
+      loadRiverStage();
+
+      home.classList.add("hidden");
+
+      game.classList.add("hidden");
+
+      matchGame.classList.add("hidden");
+
+      gateGame.classList.add("hidden");
+
+      spellGame.classList.add("hidden");
+
+      result.classList.add("hidden");
+
+      riverGame.classList.remove("hidden");
+
+      document.querySelector("#riverLevelBadge").textContent = labels[state.level];
+
+    }
+
+    function loadRiverStage() {
+
+      riverState.locked = false;
+
+      riverState.currentStep = 0;
+
+      riverState.current = riverState.deck[riverState.index];
+
+      const en = riverState.current.en;
+
+      document.querySelector("#riverQuestionText").textContent = riverState.current.zh;
+
+      document.querySelector("#riverGoalBank").textContent = `🏁 終點目標：${en.toUpperCase()}`;
+
+      document.querySelector("#riverStartBank").textContent = `🌊 起點：請點擊第 1 個字母 「${en[0].toUpperCase()}」`;
+
+      riverFeedback.textContent = `請依照單字順序踩正確的石頭過河！目前需要找：${en[0].toUpperCase()}`;
+
+      const letters = en.split("");
+
+      const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+
+      const distractorsNeeded = Math.max(0, 12 - letters.length);
+
+      const sourceLetters = banks[state.level].flatMap(([, word]) => word.split("")).filter(l => /^[a-z]$/.test(l));
+
+      const distractors = [];
+
+      for (let i = 0; i < distractorsNeeded; i++) {
+
+        const src = sourceLetters.length ? sourceLetters : alphabet;
+
+        distractors.push(src[Math.floor(Math.random() * src.length)]);
+
+      }
+
+      riverState.stones = shuffle([...letters.map((char, idx) => ({ char, step: idx, correct: true })), ...distractors.map(char => ({ char, correct: false }))]);
+
+      renderRiverStones();
+
+      updateRiverHud();
+
+    }
+
+    function renderRiverStones() {
+
+      riverGrid.innerHTML = "";
+
+      riverState.stones.forEach((stone, index) => {
+
+        const button = document.createElement("button");
+
+        button.className = "stone";
+
+        button.type = "button";
+
+        button.textContent = stone.char;
+
+        button.addEventListener("click", () => chooseRiverStone(button, stone, index));
+
+        riverGrid.appendChild(button);
+
+      });
+
+    }
+
+    function chooseRiverStone(button, stone, index) {
+
+      if (riverState.locked || button.disabled) return;
+
+      const targetEn = riverState.current.en;
+
+      const requiredChar = targetEn[riverState.currentStep];
+
+      if (stone.char.toLowerCase() === requiredChar.toLowerCase() && (stone.correct && stone.step === riverState.currentStep)) {
+
+        button.classList.add("stepped");
+
+        button.disabled = true;
+
+        riverState.currentStep += 1;
+
+        updateRiverHud();
+
+        if (riverState.currentStep >= targetEn.length) {
+
+          riverState.locked = true;
+
+          riverState.score += 5; // 每過一關（成功過河）得 5 分
+
+          riverState.answered += 1;
+
+          riverFeedback.textContent = `成功過河！完美拼出 ${targetEn.toUpperCase()}，加 5 分。`;
+
+          document.querySelector("#riverGoalBank").textContent = `🏁 成功抵達終點！🎉`;
+
+          
+
+          window.setTimeout(() => {
+
+            if (riverState.index >= riverState.deck.length - 1) {
+
+              finishRiverGame();
+
+              return;
+
+            }
+
+            riverState.index += 1;
+
+            loadRiverStage();
+
+          }, 950);
+
+        } else {
+
+          const nextChar = targetEn[riverState.currentStep];
+
+          riverFeedback.textContent = `踩對了！下一步請找：${nextChar.toUpperCase()}`;
+
+          document.querySelector("#riverStartBank").textContent = `🌊 已走 ${riverState.currentStep} 步，繼續找：${nextChar.toUpperCase()}`;
+
+        }
+
+      } else {
+
+        // 踩錯石頭落水扣生命，生命歸零才結算計分
+
+        riverState.lives -= 1;
+
+        button.classList.add("wrong");
+
+        riverState.locked = true;
+
+        riverFeedback.textContent = `踩錯石頭落水了！正確順序應為 ${targetEn.toUpperCase()}。`;
+
+        updateRiverHud();
+
+        window.setTimeout(() => {
+
+          if (riverState.lives <= 0 || riverState.index >= riverState.deck.length - 1) {
+
+            finishRiverGame(); // 死亡後計分結算
+
+            return;
+
+          }
+
+          riverState.index += 1;
+
+          loadRiverStage();
+
+        }, 1100);
+
+      }
+
+    }
+
+    function updateRiverHud() {
+
+      document.querySelector("#riverLifeText").textContent = riverState.lives;
+
+      document.querySelector("#riverScoreText").textContent = riverState.score;
+
+      document.querySelector("#riverCountText").textContent = `${riverState.index + 1} / ${riverState.deck.length}`;
+
+      document.querySelector("#riverStepText").textContent = `${riverState.currentStep} / ${riverState.current?.en.length || 0}`;
+
+    }
+
+    function finishRiverGame() {
+
+      riverGame.classList.add("hidden");
+
+      result.classList.remove("hidden");
+
+      const fullClear = riverState.answered === riverState.deck.length && riverState.lives > 0;
+
+      document.querySelector("#resultTitle").textContent = fullClear ? "單字過河通關" : "單字過河結算（生命耗盡）";
+
+      document.querySelector("#finalScore").textContent = riverState.score;
+
+      document.querySelector("#finalAnswered").textContent = riverState.answered;
+
+      document.querySelector("#finalAnsweredLabel").textContent = "成功過河關卡數";
+
+      document.querySelector("#finalLives").textContent = Math.max(riverState.lives, 0);
+
+      document.querySelector("#finalLivesLabel").textContent = "剩餘生命";
+
+      document.querySelector("#resultCopy").textContent =
+
+        `你選擇的是「${labels[state.level]}」難度。本局成功過河 ${riverState.answered} 關，總分 ${riverState.score} 分。`;
+
+    }
+
     function startMatchGame() {
 
       stopMatchTimer();
@@ -2953,6 +3429,8 @@
       gateGame.classList.add("hidden");
 
       spellGame.classList.add("hidden");
+
+      riverGame.classList.add("hidden");
 
       result.classList.add("hidden");
 
@@ -3292,6 +3770,20 @@
 
     });
 
+    document.querySelector("#riverBackBtn").addEventListener("click", () => {
+
+      riverGame.classList.add("hidden");
+
+      home.classList.remove("hidden");
+
+    });
+
+    document.querySelector("#riverResetBtn").addEventListener("click", () => {
+
+      loadRiverStage();
+
+    });
+
     document.querySelector("#spellClearBtn").addEventListener("click", clearSpellAnswer);
 
     document.querySelector("#spellSubmitBtn").addEventListener("click", submitSpellAnswer);
@@ -3333,6 +3825,14 @@
       if (state.mode === "spell") {
 
         startSpellGame();
+
+        return;
+
+      }
+
+      if (state.mode === "river") {
+
+        startRiverGame();
 
         return;
 
